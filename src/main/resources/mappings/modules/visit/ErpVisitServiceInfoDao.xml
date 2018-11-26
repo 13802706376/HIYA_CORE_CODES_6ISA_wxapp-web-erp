@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.visit.dao.ErpVisitServiceInfoDao">
+    
+    <sql id="erpVisitServiceInfoColumns">
+        a.id AS "id",
+        a.shop_info_id AS "shopInfoId",
+        a.service_address AS "serviceAddress",
+        a.service_type_code AS "serviceTypeCode",
+        a.service_goal_code AS "serviceGoalCode",
+        a.service_goal AS "serviceGoal",
+        a.service_user AS "serviceUser",
+        a.service_preparation_info AS "servicePreparationInfo",
+        a.shop_attendees AS "shopAttendees",
+        a.shop_preparation_info AS "shopPreparationInfo",
+        a.train_recorder AS "trainRecorder",
+        a.service_reason AS "serviceReason",
+        a.shop_needs_picture AS "shopNeedsPicture",
+        a.appointed_start_time AS "appointedStartTime",
+        a.appointed_end_time AS "appointedEndTime",
+        a.service_start_time AS "serviceStartTime",
+        a.service_end_time AS "serviceEndTime",
+        a.audit_status AS "auditStatus",
+        a.audit_user AS "auditUser",
+        a.cancel_reason AS "cancelReason",
+        a.modify_suggest AS "modifySuggest",
+        a.receiving_report AS "receivingReport",
+        a.proc_ins_id AS "procInsId",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.del_flag AS "delFlag",
+        a.remark AS "remark",
+        a.hardware_deliver_flag AS "hardwareDeliverFlag",
+        a.remind_flag AS "remindFlag"
+    </sql>
+
+    <sql id="erpVisitServiceInfoJoins">
+    </sql>
+    
+    <select id="get" resultType="ErpVisitServiceInfo">
+        SELECT
+            <include refid="erpVisitServiceInfoColumns"/>
+        FROM erp_visit_service_info a
+        <include refid="erpVisitServiceInfoJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="ErpVisitServiceInfo">
+        SELECT
+            <include refid="erpVisitServiceInfoColumns"/>
+        FROM erp_visit_service_info a
+        <include refid="erpVisitServiceInfoJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="procInsId != null">
+            	AND a.proc_ins_id = #{procInsId}
+            </if>
+            <if test="serviceGoalCode != null">
+            	AND a.service_goal_code = #{serviceGoalCode}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="ErpVisitServiceInfo">
+        SELECT
+            <include refid="erpVisitServiceInfoColumns"/>
+        FROM erp_visit_service_info a
+        <include refid="erpVisitServiceInfoJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO erp_visit_service_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">id,</if>
+			<if test="shopInfoId != null">shop_info_id,</if>
+			<if test="serviceAddress != null">service_address,</if>
+			<if test="serviceTypeCode != null">service_type_code,</if>
+			<if test="serviceGoalCode != null">service_goal_code,</if>
+			<if test="serviceGoal != null">service_goal,</if>
+			<if test="serviceUser != null">service_user,</if>
+			<if test="servicePreparationInfo != null">service_preparation_info,</if>
+			<if test="shopAttendees != null">shop_attendees,</if>
+			<if test="shopPreparationInfo != null">shop_preparation_info,</if>
+			<if test="trainRecorder != null">train_recorder,</if>
+			<if test="serviceReason != null">service_reason,</if>
+			<if test="shopNeedsPicture != null">shop_needs_picture,</if>
+			<if test="appointedStartTime != null">appointed_start_time,</if>
+			<if test="appointedEndTime != null">appointed_end_time,</if>
+			<if test="serviceStartTime != null">service_start_time,</if>
+			<if test="serviceEndTime != null">service_end_time,</if>
+			<if test="auditStatus != null">audit_status,</if>
+			<if test="auditUser != null">audit_user,</if>
+			<if test="cancelReason != null">cancel_reason,</if>
+			<if test="modifySuggest != null">modify_suggest,</if>
+			<if test="receivingReport != null">receiving_report,</if>
+			<if test="procInsId != null">proc_ins_id,</if>
+			<if test="createBy.id != null">create_by,</if>
+			<if test="createDate != null">create_date,</if>
+			<if test="updateBy.id != null">update_by,</if>
+			<if test="updateDate != null">update_date,</if>
+			<if test="delFlag != null">del_flag,</if>
+			<if test="remark != null">remark,</if>
+			<if test="hardwareDeliverFlag != null">hardware_deliver_flag,</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="shopInfoId != null">#{shopInfoId},</if>
+			<if test="serviceAddress != null">#{serviceAddress},</if>
+			<if test="serviceTypeCode != null">#{serviceTypeCode},</if>
+			<if test="serviceGoalCode != null">#{serviceGoalCode},</if>
+			<if test="serviceGoal != null">#{serviceGoal},</if>
+			<if test="serviceUser != null">#{serviceUser},</if>
+			<if test="servicePreparationInfo != null">#{servicePreparationInfo},</if>
+			<if test="shopAttendees != null">#{shopAttendees},</if>
+			<if test="shopPreparationInfo != null">#{shopPreparationInfo},</if>
+			<if test="trainRecorder != null">#{trainRecorder},</if>
+			<if test="serviceReason != null">#{serviceReason},</if>
+			<if test="shopNeedsPicture != null">#{shopNeedsPicture},</if>
+			<if test="appointedStartTime != null">#{appointedStartTime},</if>
+			<if test="appointedEndTime != null">#{appointedEndTime},</if>
+			<if test="serviceStartTime != null">#{serviceStartTime},</if>
+			<if test="serviceEndTime != null">#{serviceEndTime},</if>
+			<if test="auditStatus != null">#{auditStatus},</if>
+			<if test="auditUser != null">#{auditUser},</if>
+			<if test="cancelReason != null">#{cancelReason},</if>
+			<if test="modifySuggest != null">#{modifySuggest},</if>
+			<if test="receivingReport != null">#{receivingReport},</if>
+			<if test="procInsId != null">#{procInsId},</if>
+			<if test="createBy.id != null">#{createBy.id},</if>
+			<if test="createDate != null">#{createDate},</if>
+			<if test="updateBy.id != null">#{updateBy.id},</if>
+			<if test="updateDate != null">#{updateDate},</if>
+			<if test="delFlag != null">#{delFlag},</if>
+			<if test="remark != null">#{remark},</if>
+			<if test="hardwareDeliverFlag != null">#{hardwareDeliverFlag},</if>
+        </trim>
+    </insert>
+
+    <update id="update">
+        UPDATE erp_visit_service_info
+            <set>
+                <if test="shopInfoId != null">shop_info_id = #{shopInfoId},</if>
+                <if test="serviceAddress != null">service_address = #{serviceAddress},</if>
+                <if test="serviceTypeCode != null">service_type_code = #{serviceTypeCode},</if>
+                <if test="serviceGoalCode != null">service_goal_code = #{serviceGoalCode},</if>
+                <if test="serviceGoal != null">service_goal = #{serviceGoal},</if>
+                <if test="serviceUser != null">service_user = #{serviceUser},</if>
+                <if test="servicePreparationInfo != null">service_preparation_info = #{servicePreparationInfo},</if>
+                <if test="shopAttendees != null">shop_attendees = #{shopAttendees},</if>
+                <if test="shopPreparationInfo != null">shop_preparation_info = #{shopPreparationInfo},</if>
+                <if test="trainRecorder != null">train_recorder = #{trainRecorder},</if>
+                <if test="serviceReason != null">service_reason = #{serviceReason},</if>
+                <if test="shopNeedsPicture != null">shop_needs_picture = #{shopNeedsPicture},</if>
+                <if test="appointedStartTime != null">appointed_start_time = #{appointedStartTime},</if>
+                <if test="appointedEndTime != null">appointed_end_time = #{appointedEndTime},</if>
+                <if test="serviceStartTime != null">service_start_time = #{serviceStartTime},</if>
+                <if test="serviceEndTime != null">service_end_time = #{serviceEndTime},</if>
+                <if test="auditStatus != null">audit_status = #{auditStatus},</if>
+                <if test="auditUser != null">audit_user = #{auditUser},</if>
+                <if test="cancelReason != null">cancel_reason = #{cancelReason},</if>
+                <if test="modifySuggest != null">modify_suggest = #{modifySuggest},</if>
+                <if test="receivingReport != null">receiving_report = #{receivingReport},</if>
+                <if test="procInsId != null">proc_ins_id = #{procInsId},</if>
+                <if test="updateBy.id != null">update_by = #{updateBy.id},</if>
+                <if test="updateDate != null">update_date = #{updateDate},</if>
+                <if test="remark != null">remark = #{remark},</if>
+                <if test="hardwareDeliverFlag != null">hardware_deliver_flag = #{hardwareDeliverFlag},</if>
+            </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE erp_visit_service_info SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+    
+    <!--  根据流程id 和 上门目的code 获取唯一上门信息 -->
+    <select id="getByGoalCode" resultType="ErpVisitServiceInfo">
+        SELECT
+            <include refid="erpVisitServiceInfoColumns"/>
+        FROM erp_visit_service_info a
+        where
+            a.del_flag = '0'
+            AND a.proc_ins_id = #{procInsId}
+            AND a.service_goal_code = #{serviceGoalCode}
+    </select>
+
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.workflow.channel.dao.JykOrderPromotionChannelDao">
+    
+	<sql id="jykOrderPromotionChannelColumns">
+		a.id AS "id",
+		a.order_id AS "orderId",
+		a.split_id AS "splitId",
+		a.promotion_channel AS "promotionChannel",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.remark AS "remark",
+		a.sort AS "sort",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="jykOrderPromotionChannelJoins">
+	</sql>
+    
+	<select id="get" resultType="JykOrderPromotionChannel">
+		SELECT 
+			<include refid="jykOrderPromotionChannelColumns"/>
+		FROM jyk_order_promotion_channel a
+		<include refid="jykOrderPromotionChannelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="JykOrderPromotionChannel">
+		SELECT 
+			<include refid="jykOrderPromotionChannelColumns"/>
+		FROM jyk_order_promotion_channel a
+		<include refid="jykOrderPromotionChannelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="JykOrderPromotionChannel">
+		SELECT 
+			<include refid="jykOrderPromotionChannelColumns"/>
+		FROM jyk_order_promotion_channel a
+		<include refid="jykOrderPromotionChannelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="findListBySplitId" resultType="JykOrderPromotionChannel">
+		SELECT 
+			<include refid="jykOrderPromotionChannelColumns"/>
+		FROM jyk_order_promotion_channel a
+		<include refid="jykOrderPromotionChannelJoins"/>
+		<where>
+			 a.split_id=#{splitId}
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO jyk_order_promotion_channel(
+			id,
+			order_id,
+			split_id,
+			promotion_channel,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			remark,
+			sort,
+			del_flag
+		) VALUES (
+			#{id},
+			#{orderId},
+			#{splitId},
+			#{promotionChannel},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{remark},
+			#{sort},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE jyk_order_promotion_channel SET 	
+			order_id = #{orderId},
+			split_id = #{splitId},
+			promotion_channel = #{promotionChannel},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			remark = #{remark},
+			sort = #{sort}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE jyk_order_promotion_channel SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

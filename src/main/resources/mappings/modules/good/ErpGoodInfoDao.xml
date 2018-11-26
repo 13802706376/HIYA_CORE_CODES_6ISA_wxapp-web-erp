@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.good.dao.ErpGoodInfoDao">
+
+	<sql id="erpGoodInfoColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.price AS "price",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.remarks AS
+		"remarks",
+		a.sort AS "sort",
+		a.del_flag AS "delFlag",
+		a.category_id AS
+		"categoryId"
+	</sql>
+
+	<sql id="erpGoodInfoJoins">
+		
+	</sql>
+
+	<select id="get" resultType="ErpGoodInfo">
+		SELECT
+		<include refid="erpGoodInfoColumns" />
+		FROM erp_good_info a
+		<include refid="erpGoodInfoJoins" />
+		WHERE   a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="ErpGoodInfo">
+		SELECT
+		<include refid="erpGoodInfoColumns" />
+		FROM erp_good_info a
+		<!-- <include refid="erpGoodInfoJoins" /> -->
+		left join erp_good_category c on a.category_id=c.id 
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="category != null and category.id != null and category.id != ''">
+				AND c.id = #{category.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="ErpGoodInfo">
+		SELECT
+		<include refid="erpGoodInfoColumns" />
+		FROM erp_good_info a
+		<include refid="erpGoodInfoJoins" />
+		<where>
+			a.category_id=c.id
+			AND a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO erp_good_info(
+		id,
+		name,
+		price,
+		create_date,
+		update_date,
+		create_by,
+		update_by,
+		remarks,
+		sort,
+		del_flag,
+		category_id
+		) 
+		VALUES (
+		#{id},
+		#{name},
+		#{price},
+		#{createDate},
+		#{updateDate},
+		#{createBy.id},
+		#{updateBy.id},
+		#{remarks},
+		#{sort},
+		#{delFlag},
+		#{categoryId}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE erp_good_info SET
+		name = #{name},
+		price =
+		#{price},
+		update_date = #{updateDate},
+		update_by = #{updateBy.id},
+		remarks = #{remarks},
+		sort = #{sort},
+		category_id = #{categoryId}
+		WHERE
+		id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE erp_good_info SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id = "updateCategoryId">
+		UPDATE erp_good_info SET 
+		category_id = #{categoryId}
+		WHERE
+		id = #{id}
+	</update>
+	
+	<delete id="batchDelete">
+        update erp_good_info set del_flag = '1' where id not in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <select id="getDetail" resultType="ErpGoodInfo">
+		SELECT
+		a.id AS "id",
+		a.name AS "name",
+		a.price AS "price",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.remarks AS
+		"remarks",
+		a.sort AS "sort",
+		a.del_flag AS "delFlag",
+		a.category_id AS
+		"categoryId" 
+		FROM erp_good_info a
+		WHERE 
+		a.id = #{id}
+	</select>
+	
+	<update id="updateDetail">
+		UPDATE erp_good_info SET
+		name = #{name},
+		price =
+		#{price},
+		update_date = #{updateDate},
+		del_flag = #{delFlag} 
+		WHERE
+		id = #{id}
+	</update>
+</mapper>

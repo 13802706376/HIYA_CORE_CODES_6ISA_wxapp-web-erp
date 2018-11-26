@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.team.dao.ErpTeamUserDao">
+    
+	<sql id="erpTeamUserColumns">
+		a.team_id AS "teamId",
+		a.leader_flag AS "leaderFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.user_id AS "userId",
+		a.id AS "id"
+	</sql>
+	
+	<sql id="erpTeamUserJoins">
+		LEFT JOIN sys_user u9 ON u9.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="ErpTeamUser">
+		SELECT 
+			<include refid="erpTeamUserColumns"/>
+		FROM erp_team_user a
+		<include refid="erpTeamUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErpTeamUser">
+		SELECT 
+			<include refid="erpTeamUserColumns"/>
+		FROM erp_team_user a
+		<include refid="erpTeamUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpTeamUser">
+		SELECT 
+			<include refid="erpTeamUserColumns"/>
+		FROM erp_team_user a
+		<include refid="erpTeamUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO erp_team_user(
+			team_id,
+			leader_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			user_id,
+			id
+		) VALUES (
+			#{teamId},
+			#{leaderFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{userId},
+			#{id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_team_user SET 	
+			team_id = #{teamId},
+			leader_flag = #{leaderFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			user_id = #{userId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE erp_team_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteByTeamId">
+		DELETE FROM erp_team_user where team_id = #{teamId} 
+	</delete>
+	
+	<select id="findListByTeamId" resultType="ErpTeamUser">
+		SELECT 
+			<include refid="erpTeamUserColumns"/>,
+			b.name AS "userName"  
+		FROM erp_team_user a LEFT JOIN sys_user b ON a.user_id = b.id 
+		WHERE a.team_id = #{teamId}
+	</select>
+	
+	
+	<select id="findwhereuser" resultType="ErpTeamUser">
+		SELECT 
+			<include refid="erpTeamUserColumns"/>
+		FROM erp_team_user a
+		<include refid="erpTeamUserJoins"/>
+		<where>
+			a.del_flag = #{del} AND a.leader_flag=#{leaderf} AND a.user_id=#{userid}
+		</where>	
+	</select>
+	
+	<select id="findwhereteam" resultType="ErpTeamUser">
+		SELECT 
+			<include refid="erpTeamUserColumns"/>
+		FROM erp_team_user a
+		<include refid="erpTeamUserJoins"/>
+		<where>
+			a.del_flag = #{del}  AND a.team_id=#{tid}
+		</where>	
+	</select>
+</mapper>

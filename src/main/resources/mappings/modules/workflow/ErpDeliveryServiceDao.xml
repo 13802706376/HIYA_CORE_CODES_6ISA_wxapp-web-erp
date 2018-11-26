@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.workflow.delivery.dao.ErpDeliveryServiceDao">
+    
+	<sql id="erpDeliveryServiceColumns">
+		a.id AS "id",
+		a.order_id AS "orderId",
+		a.order_number AS "orderNumber",
+		a.shop_id AS "shopId",
+		a.shop_name AS "shopName",
+		a.source AS "source",
+		a.proc_ins_id AS "procInsId",
+		a.remark AS "remark",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.flow_end_time AS "flowEndTime",
+		a.service_type AS "serviceType",
+		a.start_time AS "startTime"
+	</sql>
+	
+	<sql id="erpDeliveryServiceColumns1">
+		a.order_id AS "orderId",
+		a.order_number AS "orderNumber",
+		a.shop_id AS "shopId",
+		a.shop_name AS "shopName",
+		a.source AS "source",
+		a.proc_ins_id AS "procInsId",
+		a.remark AS "remark",
+		a.flow_end_time AS "flowEndTime"
+	</sql>
+	
+	<sql id="erpDeliveryServiceJoins">
+	</sql>
+    
+	<select id="get" resultType="ErpDeliveryService">
+		SELECT 
+			<include refid="erpDeliveryServiceColumns"/>
+		FROM erp_delivery_service a
+		<include refid="erpDeliveryServiceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErpDeliveryService">
+		SELECT 
+			<include refid="erpDeliveryServiceColumns"/>
+		FROM erp_delivery_service a
+		<include refid="erpDeliveryServiceJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpDeliveryService">
+		SELECT 
+			<include refid="erpDeliveryServiceColumns"/>
+		FROM erp_delivery_service a
+		<include refid="erpDeliveryServiceJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO erp_delivery_service(
+			id,
+			order_id,
+			order_number,
+			shop_id,
+			shop_name,
+			source,
+			proc_ins_id,
+			remark,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			flow_end_time
+		) VALUES (
+			#{id},
+			#{orderId},
+			#{orderNumber},
+			#{shopId},
+			#{shopName},
+			#{source},
+			#{procInsId},
+			#{remark},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{flowEndTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_delivery_service SET 	
+			order_id = #{orderId},
+			shop_id = #{shopId},
+			order_number = #{orderNumber},
+			shop_name = #{shopName},
+			source = #{source},
+			proc_ins_id = #{procInsId},
+			remark = #{remark},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			<if test="shouldFlowEndTime">should_flow_end_time = #{shouldFlowEndTime},</if>
+			<if test="startTime">start_time = #{startTime},</if>
+			<if test="trainTestTime">train_test_time =#{trainTestTime},</if>
+			<if test="shouldTrainTestTime">should_train_test_time =#{shouldTrainTestTime},</if>
+			<if test="materielTime">materiel_time =#{materielTime},</if>
+			<if test="shouldMaterielTime">should_materiel_time =#{shouldMaterielTime},</if>
+			<if test="visitServiceTime">visit_service_time =#{visitServiceTime},</if>
+			<if test="shouldVisitServiceTime">should_visit_service_time =#{shouldVisitServiceTime},</if>
+			flow_end_time = #{flowEndTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM erp_delivery_service
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getDeliveryInfoByProsIncId" resultType="ErpDeliveryService">
+		SELECT 
+			<include refid="erpDeliveryServiceColumns"/>
+		FROM erp_delivery_service a
+		<include refid="erpDeliveryServiceJoins"/>
+		WHERE a.proc_ins_id = #{procInsId}
+	
+	</select>
+	
+	<select id="getDeliveryInfoByShopId" resultType="ErpDeliveryService">
+		SELECT 
+			<include refid="erpDeliveryServiceColumns"/>
+		FROM erp_delivery_service a
+		<include refid="erpDeliveryServiceJoins"/>
+		WHERE a.shop_id = #{zhangbeiId}
+	
+	</select>
+	
+	 <select id="findTaskIdByShopId" resultType="String">
+		SELECT aa.ID_ FROM ACT_RU_TASK aa 
+			LEFT JOIN erp_delivery_service a ON aa.PROC_INST_ID_ = a.proc_ins_id
+    	  WHERE a.shop_id = #{zhangbeiId}
+	</select>
+	
+	<select id="getDeliveryInfoByOrederId" resultType="ErpDeliveryService">
+	SELECT 
+		<include refid="erpDeliveryServiceColumns"/>
+	FROM erp_delivery_service a
+	<include refid="erpDeliveryServiceJoins"/>
+	WHERE a.order_id = #{orderId}
+	</select>
+	
+	<!-- 正在跑的流程 ，根据流程类型集合 和 角色类型集合 获取人员id -->
+	<select id="findBeginByTypeAndRole" resultType="java.lang.String">
+		SELECT flowUser.user_id 
+		FROM erp_delivery_service deliveryService 
+		LEFT JOIN erp_order_original_info eooi on deliveryService.order_id = eooi.id and eooi.cancel = 0 and eooi.del_flag = 0
+		LEFT JOIN erp_order_flow_user flowUser on deliveryService.order_id = flowUser.order_id 
+		WHERE (deliveryService.flow_end_time is null or deliveryService.flow_end_time = '0000-00-00 00:00:00')
+			and flowUser.flow_user_id is not null and flowUser.flow_user_id != ''
+			and deliveryService.train_test_time &lt;= '0000-00-00 00:00:00'
+			<if test="zhangbeiId != null">
+				and eooi.shop_id = #{zhangbeiId}
+			</if>
+			<if test="typeList != null and typeList.size() > 0">
+				and deliveryService.service_type in  
+				<foreach item="typeItem"  collection="typeList" open="(" separator="," close=")">
+					#{typeItem}
+				</foreach>
+			</if>
+			<if test="roleTypeList != null and roleTypeList.size > 0">
+				and flowUser.flow_user_id in 
+				<foreach item="roleTypeItem" collection="roleTypeList" open="(" separator="," close=")">
+					#{roleTypeItem}
+				</foreach>
+			</if>
+		GROUP BY flowUser.user_id
+	</select>
+	
+	<!-- 根据掌贝id 和 结束状态 获取列表 -->
+	<select id="findByEndFlag" resultType="ErpDeliveryService">
+		SELECT 
+		<include refid="erpDeliveryServiceColumns"/>
+		FROM erp_delivery_service a
+		INNER  JOIN erp_order_original_info orderInfo on a.order_id = orderInfo.id 
+						AND orderInfo.del_flag = '0'  and orderInfo.cancel = '0'
+		WHERE a.upgrade_flag = 'N'
+		<if test="zhangbeiId != null">
+			AND a.shop_id = #{zhangbeiId}
+		</if>
+		<if test='endFlag == "Y"'>
+			AND a.flow_end_time &gt; '0000-00-00 00:00:00'
+		</if>
+		<if test='endFlag == "N"'>
+			AND (a.flow_end_time is null or a.flow_end_time = '0000-00-00 00:00:00')
+		</if>
+		<if test="serviceTypeList != null and serviceTypeList.size() > 0">
+			and a.service_type in  
+			<foreach item="typeItem"  collection="serviceTypeList" open="(" separator="," close=")">
+				#{typeItem}
+			</foreach>
+		</if>
+		
+	</select>
+	
+	<!-- 获取智慧餐厅列表 -->
+	<select id="findZhiHuiByEndFlag" resultType="ErpDeliveryService">
+		SELECT 
+		serviceProgress.start_time "flowEndTime",
+		<include refid="erpDeliveryServiceColumns"/>
+		FROM erp_delivery_service a
+		INNER  JOIN erp_order_original_info orderInfo on a.order_id = orderInfo.id 
+						AND orderInfo.del_flag = '0'  and orderInfo.cancel = '0'
+		LEFT JOIN erp_service_progress serviceProgress on serviceProgress.proc_ins_id = a.proc_ins_id and serviceProgress.del_flag = '0'
+		LEFT JOIN erp_service_progress_template progressTemplate on progressTemplate.id = serviceProgress.template_id AND progressTemplate.del_flag = '0'
+		WHERE a.zhct_type !='' AND a.upgrade_flag = 'N' AND progressTemplate.service_type = 'ZhiHuiCanTing'
+		<if test="zhangbeiId != null">
+			AND a.shop_id = #{zhangbeiId}
+		</if>
+		<if test='endFlag == "Y"'>
+			AND progressTemplate.type = 'ServiceEnd' AND progressTemplate.`status` = 'End'
+		</if>
+		<if test='endFlag == "N"'>
+			AND progressTemplate.type = 'ServiceEnd' AND progressTemplate.`status` != 'End'
+		</if>
+	</select>
+	
+</mapper>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.material.dao.ErpOrderMaterialContentDao">
+
+    <sql id="erpOrderMaterialContentColumns">
+        a.id AS "id",
+        a.order_number AS "orderNumber",
+        a.material_quality AS "materialQuality",
+        a.material_type AS "materialType",
+        a.size AS "size",
+        a.material_amount AS "materialAmount",
+        a.front_image AS "frontImage",
+        a.reverse_image AS "reverseImage",
+        a.material_image AS "materialImage",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag"
+    </sql>
+
+    <sql id="erpOrderMaterialContentJoins">
+    </sql>
+    
+    <select id="get" resultType="ErpOrderMaterialContent">
+        SELECT
+            <include refid="erpOrderMaterialContentColumns"/>
+        FROM erp_order_material_content a
+        <include refid="erpOrderMaterialContentJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="ErpOrderMaterialContent">
+        SELECT
+            <include refid="erpOrderMaterialContentColumns"/>
+        FROM erp_order_material_content a
+        <include refid="erpOrderMaterialContentJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="ErpOrderMaterialContent">
+        SELECT
+            <include refid="erpOrderMaterialContentColumns"/>
+        FROM erp_order_material_content a
+        <include refid="erpOrderMaterialContentJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO erp_order_material_content
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">id,</if>
+			<if test="orderNumber != null">order_number,</if>
+			<if test="materialQuality != null">material_quality,</if>
+			<if test="materialType != null">material_type,</if>
+			<if test="size != null">size,</if>
+			<if test="materialAmount != null">material_amount,</if>
+			<if test="frontImage != null">front_image,</if>
+			<if test="reverseImage != null">reverse_image,</if>
+			<if test="materialImage != null">material_image,</if>
+			<if test="createBy.id != null">create_by,</if>
+			<if test="createDate != null">create_date,</if>
+			<if test="updateBy.id != null">update_by,</if>
+			<if test="updateDate != null">update_date,</if>
+			<if test="remarks != null">remarks,</if>
+			<if test="delFlag != null">del_flag,</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="orderNumber != null">#{orderNumber},</if>
+			<if test="materialQuality != null">#{materialQuality},</if>
+			<if test="materialType != null">#{materialType},</if>
+			<if test="size != null">#{size},</if>
+			<if test="materialAmount != null">#{materialAmount},</if>
+			<if test="frontImage != null">#{frontImage},</if>
+			<if test="reverseImage != null">#{reverseImage},</if>
+			<if test="materialImage != null">#{materialImage},</if>
+			<if test="createBy.id != null">#{createBy.id},</if>
+			<if test="createDate != null">#{createDate},</if>
+			<if test="updateBy.id != null">#{updateBy.id},</if>
+			<if test="updateDate != null">#{updateDate},</if>
+			<if test="remarks != null">#{remarks},</if>
+			<if test="delFlag != null">#{delFlag},</if>
+        </trim>
+    </insert>
+
+    <update id="update">
+        UPDATE erp_order_material_content
+            <set>
+                <if test="orderNumber != null">order_number = #{orderNumber},</if>
+                <if test="materialQuality != null">material_quality = #{materialQuality},</if>
+                <if test="materialType != null">material_type = #{materialType},</if>
+                <if test="size != null">size = #{size},</if>
+                <if test="materialAmount != null">material_amount = #{materialAmount},</if>
+                <if test="frontImage != null">front_image = #{frontImage},</if>
+                <if test="reverseImage != null">reverse_image = #{reverseImage},</if>
+                <if test="materialImage != null">material_image = #{materialImage},</if>
+                <if test="updateBy.id != null">update_by = #{updateBy.id},</if>
+                <if test="updateDate != null">update_date = #{updateDate},</if>
+                <if test="remarks != null">remarks = #{remarks},</if>
+            </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE erp_order_material_content SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findByOrderNumber" resultType="ErpOrderMaterialContent">
+        SELECT
+        <include refid="erpOrderMaterialContentColumns"/>
+        FROM erp_order_material_content a
+        WHERE a.order_number = #{orderNumber}
+        <if test="delFlag != null">and a.del_flag = #{delFlag}</if>
+    </select>
+
+    <delete id="deleteByOrderNumber">
+        delete from erp_order_material_content where order_number = #{orderNumber}
+    </delete>
+
+    <insert id="saveBatch" parameterType="java.util.List">
+        INSERT INTO erp_order_material_content
+        (
+        `id`, `order_number`, `material_quality`, `material_type`, `size`, `material_amount`,
+        `front_image`, `reverse_image`, `material_image`, `remarks`
+        )
+        VALUES
+        <foreach collection="list" index="material" separator=",">
+            (
+            #{material.id}, #{material.orderNumber}, #{material.materialQuality},
+            #{material.materialType}, #{material.size}, #{material.materialAmount}, #{material.frontImage},
+            #{material.reverseImage}, #{material.materialImage}, #{material.remarks}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

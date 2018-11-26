@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.team.dao.ErpTeamDao">
+    
+	<sql id="erpTeamColumns">
+		a.id AS "id",
+		a.team_name AS "teamName",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="erpTeamJoins">
+	</sql>
+    
+	<select id="get" resultType="ErpTeam">
+		SELECT 
+			<include refid="erpTeamColumns"/>
+		FROM erp_team a
+		<include refid="erpTeamJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErpTeam">
+		SELECT 
+			<include refid="erpTeamColumns"/>
+			<!-- ,GROUP_CONCAT(d.`name`) AS "leaderNames" , GROUP_CONCAT(e.`name`) AS "memberNames" 
+		FROM erp_team a 
+		LEFT JOIN erp_team_user b ON a.id = b.`team_id` AND b.`leader_flag` = 0 
+	LEFT JOIN sys_user d ON b.`user_id` = d.`id`
+	 LEFT JOIN erp_team_user c ON a.`id` = c.team_id  AND c.`leader_flag` = 1 
+	 LEFT JOIN sys_user e ON c.`user_id` = e.`id` -->
+	 
+	 ,(SELECT GROUP_CONCAT(c.name) FROM erp_team_user b LEFT JOIN sys_user c ON b.user_id = c.id 
+	WHERE b.`leader_flag` = 0 AND b.`team_id` = a.id 
+	GROUP BY b.team_id) AS "memberNames" ,
+	(SELECT GROUP_CONCAT(c.name) FROM erp_team_user b LEFT JOIN sys_user c ON b.user_id = c.id 
+	WHERE b.`leader_flag` = 1 AND b.`team_id` = a.id 
+	GROUP BY b.team_id) AS "leaderNames" 
+	 FROM erp_team a 
+		<include refid="erpTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="teamName != null and teamName != ''">
+				AND a.team_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{teamName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{teamName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{teamName},'%')</if>
+			</if>
+		</where>
+		 GROUP BY a.id 
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpTeam">
+		SELECT 
+			<include refid="erpTeamColumns"/>
+		FROM erp_team a
+		<include refid="erpTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO erp_team(
+			id,
+			team_name,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{teamName},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_team SET 	
+			team_name = #{teamName}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE erp_team SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findteam" resultType="java.lang.Integer">
+		SELECT 
+			COUNT(*)
+		FROM erp_team a
+		<where>
+			a.del_flag = #{del} AND a.id=#{teamid}
+		</where>		
+	</select>
+	
+</mapper>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.store.basic.dao.ErpStorePromotePhotoMaterialDao">
+    
+	<sql id="erpStorePromotePhotoMaterialColumns">
+		a.audit_status AS "auditStatus",
+		a.id AS "id",
+		a.environment_photo AS "environmentPhoto",
+		a.product_photo AS "productPhoto",
+		a.environment_photo_count AS "environmentPhotoCount",
+		a.product_photo_count AS "productPhotoCount",
+		a.menu_or_service_photo AS "menuOrServicePhoto",
+		a.menu_or_service_photo_count AS "menuOrServicePhotoCount",
+		a.store_info_id AS "erpStoreInfoId",
+		a.finish_status AS "finishStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="erpStorePromotePhotoMaterialJoins">
+	</sql>
+    
+	<select id="get" resultType="ErpStorePromotePhotoMaterial">
+		SELECT 
+			<include refid="erpStorePromotePhotoMaterialColumns"/>
+		FROM erp_store_promote_photo_material a
+		<include refid="erpStorePromotePhotoMaterialJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErpStorePromotePhotoMaterial">
+		SELECT 
+			<include refid="erpStorePromotePhotoMaterialColumns"/>
+		FROM erp_store_promote_photo_material a
+		<include refid="erpStorePromotePhotoMaterialJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="auditStatus != null and auditStatus != ''">
+				AND a.audit_status = #{auditStatus}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpStorePromotePhotoMaterial">
+		SELECT 
+			<include refid="erpStorePromotePhotoMaterialColumns"/>
+		FROM erp_store_promote_photo_material a
+		<include refid="erpStorePromotePhotoMaterialJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO erp_store_promote_photo_material(
+			audit_status,
+			id,
+			environment_photo,
+			product_photo,
+			menu_or_service_photo,
+			environment_photo_count,
+			product_photo_count,
+			menu_or_service_photo_count,
+			store_info_id,
+			finish_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{auditStatus},
+			#{id},
+			#{environmentPhoto},
+			#{productPhoto},
+			#{menuOrServicePhoto},
+			#{environmentPhotoCount},
+			#{productPhotoCount},
+			#{menuOrServicePhotoCount},
+			#{erpStoreInfoId},
+			#{finishStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_store_promote_photo_material 
+		<set> 	
+			<if test="auditStatus != null">audit_status = #{auditStatus},</if>
+			<if test="environmentPhoto != null">environment_photo = #{environmentPhoto},</if>
+			<if test="productPhoto != null">product_photo = #{productPhoto},</if>
+			<if test="menuOrServicePhoto != null">menu_or_service_photo = #{menuOrServicePhoto},</if>
+			<if test="environmentPhotoCount != null">environment_photo_count = #{environmentPhotoCount},</if>
+			<if test="productPhotoCount != null">product_photo_count = #{productPhotoCount},</if>
+			<if test="menuOrServicePhotoCount != null">menu_or_service_photo_count = #{menuOrServicePhotoCount},</if>
+			<if test="erpStoreInfoId != null">store_info_id = #{erpStoreInfoId},</if>
+			<if test="finishStatus != null">finish_status = #{finishStatus},</if>
+			<if test="updateBy != null and updateBy.id != null">update_by = #{updateBy.id},</if>
+			<if test="updateDate != null">update_date = #{updateDate},</if>
+			<if test="remarks != null">remarks = #{remarks}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE erp_store_promote_photo_material SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getErpStoreInfo" resultType="ErpStorePromotePhotoMaterial">
+		SELECT
+			<include refid="erpStorePromotePhotoMaterialColumns"/>
+		FROM
+			erp_store_info esi
+		LEFT JOIN
+			erp_store_promote_photo_material a
+		ON
+			esi.id = a.store_info_id AND a.del_flag = '0'
+		WHERE
+			esi.del_flag = '0'
+		and 
+			esi.sync_oem = 'N'
+			<if test="erpStoreInfoId != null and erpStoreInfoId != '' ">and esi.id = #{erpStoreInfoId}</if>
+			<if test="shopId != null and shopId != '' ">and esi.shop_info_id = #{shopId}</if>
+			<if test="isMain != null">and esi.is_main = #{isMain}</if>
+	</select>
+	
+	<!--  根据商户id 获取商户主体门店的推广图片素材  -->
+	<select id="getStoreMainByShopId" resultType="ErpStorePromotePhotoMaterial">
+		SELECT <include refid="erpStorePromotePhotoMaterialColumns"/>
+	    FROM erp_store_promote_photo_material a
+		LEFT JOIN erp_store_info esi ON esi.id = a.store_info_id
+		WHERE esi.shop_info_id = #{shopId}
+				AND esi.is_main = 1
+				AND esi.del_flag = 0
+				AND a.del_flag = 0
+				and esi.sync_oem = 'N'
+	</select>
+	
+	<!-- 根据门店id 获取推广图片素材 -->
+	<select id="getByStoreId" resultType="ErpStorePromotePhotoMaterial">
+		SELECT <include refid="erpStorePromotePhotoMaterialColumns"/>
+	    FROM erp_store_promote_photo_material a 
+	    where a.store_info_id = #{storeId} and a.del_flag = 0
+	</select>
+	
+</mapper>

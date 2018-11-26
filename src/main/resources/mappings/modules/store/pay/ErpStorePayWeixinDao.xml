@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.store.pay.dao.ErpStorePayWeixinDao">
+    
+	<sql id="erpStorePayWeixinColumns">
+		a.id AS "id",
+		a.audit_status AS "auditStatus",
+		a.bank_id AS "bankId",
+		a.provide_account_info AS "provideAccountInfo",
+		a.public_account_no AS "publicAccountNo",
+		a.public_account_password AS "publicAccountPassword",
+		a.public_account_appid AS "publicAccountAppid",
+		a.audit_status AS "auditStatus",
+		a.finish_status AS "finishStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="erpStorePayWeixinJoins">
+	</sql>
+    
+	<select id="get" resultType="ErpStorePayWeixin">
+		SELECT 
+			<include refid="erpStorePayWeixinColumns"/>
+		FROM erp_store_pay_weixin a
+		<include refid="erpStorePayWeixinJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErpStorePayWeixin">
+		SELECT 
+			<include refid="erpStorePayWeixinColumns"/>
+		FROM erp_store_pay_weixin a
+		<include refid="erpStorePayWeixinJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="publicAccountNo != null and publicAccountNo != ''">
+				AND a.public_account_no = #{publicAccountNo}
+			</if>
+			<if test="publicAccountAppid != null and publicAccountAppid != ''">
+				AND a.public_account_appid = #{publicAccountAppid}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpStorePayWeixin">
+		SELECT 
+			<include refid="erpStorePayWeixinColumns"/>
+		FROM erp_store_pay_weixin a
+		<include refid="erpStorePayWeixinJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO erp_store_pay_weixin(
+			id,
+			bank_id,
+			provide_account_info,
+			public_account_no,
+			public_account_password,
+			public_account_appid,
+			audit_status,
+			finish_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			<if test="emailNo != null">email_no,</if>
+			<if test="emailPassword != null">email_password,</if>
+			<if test="operatorIdcard != null">operator_idcard,</if>
+			<if test="operatorEmail != null">operator_email,</if>
+			<if test="operatorMobile != null">operator_mobile,</if>
+			<if test="operatorName != null">operator_name,</if>
+			<if test="weixinNo != null">weixin_no,</if>
+			<if test="publicAccountName != null">public_account_name,</if>
+			del_flag
+		) VALUES (
+			#{id},
+			#{bankId},
+			#{provideAccountInfo},
+			#{publicAccountNo},
+			#{publicAccountPassword},
+			#{publicAccountAppid},
+			#{auditStatus},
+			#{finishStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			<if test="emailNo != null">#{emailNo},</if>
+			<if test="emailPassword != null">#{emailPassword},</if>
+			<if test="operatorIdcard != null">#{operatorIdcard},</if>
+			<if test="operatorEmail != null">#{operatorEmail},</if>
+			<if test="operatorMobile != null">#{operatorMobile},</if>
+			<if test="operatorName != null">#{operatorName},</if>
+			<if test="weixinNo != null">#{weixinNo},</if>
+			<if test="publicAccountName != null">#{publicAccountName},</if>
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_store_pay_weixin 
+		<set> 	
+			<if test="bankId != null">bank_id = #{bankId},</if>
+			<if test="provideAccountInfo != null">provide_account_info = #{provideAccountInfo},</if>
+			<if test="publicAccountNo != null">public_account_no = #{publicAccountNo},</if>
+			<if test="publicAccountPassword != null">public_account_password = #{publicAccountPassword},</if>
+			<if test="publicAccountAppid != null">public_account_appid = #{publicAccountAppid},</if>
+			<if test="auditStatus != null">audit_status = #{auditStatus},</if>
+			<if test="finishStatus != null">finish_status = #{finishStatus},</if>
+			<if test="updateBy != null and updateBy.id != null">update_by = #{updateBy.id},</if>
+			<if test="updateDate != null">update_date = #{updateDate},</if>
+			<if test="remarks != null">remarks = #{remarks},</if>
+			<if test="emailNo != null">email_no = #{emailNo},</if>
+			<if test="emailPassword != null">email_password = #{emailPassword},</if>
+			<if test="operatorIdcard != null">operator_idcard = #{operatorIdcard},</if>
+			<if test="operatorEmail != null">operator_email = #{operatorEmail},</if>
+			<if test="operatorMobile != null">operator_mobile = #{operatorMobile},</if>
+			<if test="operatorName != null">operator_name = #{operatorName},</if>
+			<if test="weixinNo != null">weixin_no = #{weixinNo},</if>
+			<if test="publicAccountName != null">public_account_name = #{publicAccountName}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE erp_store_pay_weixin SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getPayInfo" resultType="ErpStorePayWeixin">
+		SELECT
+			esb.id AS "bank.id",
+			esb.account_type AS "bank.accountType",
+			esb.bank_id AS "bank.bankId",
+			esb.credit_card_no AS "bank.creditCardNo",
+			esb.open_account_name AS "bank.openAccountName",
+			esb.bank_name AS "bank.bankName",
+			esb.branch_bank_name AS "bank.branchBankName",
+			espw.id AS "id",
+			espw.audit_status AS "auditStatus",
+			espw.provide_account_info AS "provideAccountInfo",
+			espw.public_account_no AS "publicAccountNo",
+			espw.public_account_password AS "publicAccountPassword",
+			espw.public_account_appid AS "publicAccountAppid",
+			esi.business_type AS "shopBusinessType"
+		FROM
+			erp_store_info esi
+		LEFT JOIN
+			erp_store_pay_weixin espw
+		ON
+			esi.weixin_pay_id = espw.id AND espw.del_flag = '0'
+		LEFT JOIN
+			erp_store_bank esb
+		ON
+			espw.bank_id = esb.id AND esb.del_flag = '0'
+		WHERE
+			esi.del_flag = '0'
+		and 
+			esi.sync_oem = 'N'
+		<if test="erpStoreInfoId != null">AND esi.id = #{erpStoreInfoId}</if>
+		<if test="shopId != null">AND esi.shop_info_id = #{shopId}</if>
+		<if test="isMain != null">AND esi.is_main = #{isMain}</if>
+	</select>
+	
+</mapper>

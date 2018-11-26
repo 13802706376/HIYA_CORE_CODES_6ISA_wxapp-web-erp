@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.store.basic.dao.ErpStoreInfoDao">
+    
+	<sql id="erpStoreInfoColumns">
+		a.id AS "id",
+		a.is_main AS "isMain",
+		a.short_name AS "shortName",
+		a.province AS "province",
+		a.city AS "city",
+		a.area AS "area",
+		a.province_name AS "provinceName",
+		a.city_name AS "cityName",
+		a.area_name AS "areaName",
+		a.address AS "address",
+		a.telephone AS "telephone",
+		a.company_url AS "companyUrl",
+		a.product_name AS "productName",
+		a.product_concrete_info AS "productConcreteInfo",
+		a.business_type AS "businessType",
+		a.audit_status AS "auditStatus",
+		a.cover AS cover,
+		a.shop_info_id AS "shopInfoId",
+		a.legal_person_id AS "legalPersonId",
+		a.credentials_id AS "credentialsId",
+		a.weixin_pay_id AS "weixinPayId",
+		a.unionpay_id AS "unionpayId",
+		a.advertiser_friends_id AS "advertiserFriendsId",
+		a.advertiser_weibo_id AS "advertiserWeiboId",
+		a.advertiser_momo_id AS "advertiserMomoId",
+		a.finish_status AS "finishStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.page_edit_tag AS "pageEditTag",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="erpStoreInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="ErpStoreInfo">
+		SELECT 
+			<include refid="erpStoreInfoColumns"/>
+		FROM erp_store_info a
+		<include refid="erpStoreInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErpStoreInfo">
+		SELECT 
+			<include refid="erpStoreInfoColumns"/>
+		FROM erp_store_info a
+		<include refid="erpStoreInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.sync_oem = 'N'
+			<if test="isMain != null and isMain != ''">
+				AND a.is_main = #{isMain}
+			</if>
+			<if test="shortName != null and shortName != ''">
+				AND a.short_name = #{shortName}
+			</if>
+			<if test="city != null and city != ''">
+				AND a.city = #{city}
+			</if>
+			<if test="businessType != null and businessType != ''">
+				AND a.business_type = #{businessType}
+			</if>
+			<if test="shopInfoId != null and shopInfoId != ''">
+				AND a.shop_info_id = #{shopInfoId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpStoreInfo">
+		SELECT 
+			<include refid="erpStoreInfoColumns"/>
+		FROM erp_store_info a
+		<include refid="erpStoreInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.sync_oem = 'N'
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO erp_store_info(
+			id,
+			is_main,
+			short_name,
+			province,
+			city,
+			area,
+			province_name,
+			city_name,
+			area_name,
+			address,
+			<if test="telephone != null">telephone,</if>
+			company_url,
+			product_name,
+			product_concrete_info,
+			business_type,
+			audit_status,
+			cover,
+			shop_info_id,
+			legal_person_id,
+			credentials_id,
+			weixin_pay_id,
+			unionpay_id,
+			advertiser_friends_id,
+			advertiser_weibo_id,
+			advertiser_momo_id,
+			finish_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{isMain},
+			#{shortName},
+			#{province},
+			#{city},
+			#{area},
+			#{provinceName},
+			#{cityName},
+			#{areaName},
+			#{address},
+			<if test="telephone != null">#{telephone},</if>
+			#{companyUrl},
+			#{productName},
+			#{productConcreteInfo},
+			#{businessType},
+			#{auditStatus},
+			#{cover},
+			#{shopInfoId},
+			#{legalPersonId},
+			#{credentialsId},
+			#{weixinPayId},
+			#{unionpayId},
+			#{advertiserFriendsId},
+			#{advertiserWeiboId},
+			#{advertiserMomoId},
+			#{finishStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_store_info 
+			<set>
+				<if test="isMain != null">is_main = #{isMain},</if>
+				<if test="shortName != null">short_name = #{shortName},</if>
+				<if test="province != null">province = #{province},</if>
+				<if test="city != null">city = #{city},</if>
+				<if test="area != null">area = #{area},</if>
+				<if test="provinceName != null">province_name = #{provinceName},</if>
+				<if test="cityName != null">city_name = #{cityName},</if>
+				<if test="areaName != null">area_name = #{areaName},</if>
+				<if test="address != null">address = #{address},</if>
+				<if test="telephone != null">telephone = #{telephone},</if>
+				<if test="companyUrl != null">company_url = #{companyUrl},</if>
+				<if test="productName != null">product_name = #{productName},</if>
+				<if test="productConcreteInfo != null">product_concrete_info = #{productConcreteInfo},</if>
+				<if test="businessType != null">business_type = #{businessType},</if>
+				<if test="auditStatus != null">audit_status = #{auditStatus},</if>
+				<if test="cover != null">cover = #{cover},</if>
+				<if test="shopInfoId != null">shop_info_id = #{shopInfoId},</if>
+				<if test="legalPersonId != null">legal_person_id = #{legalPersonId},</if>
+				<if test="credentialsId != null">credentials_id = #{credentialsId},</if>
+				<if test="weixinPayId != null">weixin_pay_id = #{weixinPayId},</if>
+				<if test="unionpayId != null">unionpay_id = #{unionpayId},</if>
+				<if test="advertiserFriendsId != null">advertiser_friends_id = #{advertiserFriendsId},</if>
+				<if test="advertiserWeiboId != null">advertiser_weibo_id = #{advertiserWeiboId},</if>
+				<if test="advertiserMomoId != null">advertiser_momo_id = #{advertiserMomoId},</if>
+				<if test="finishStatus != null">finish_status = #{finishStatus},</if>
+				<if test="updateBy != null and updateBy.id != null">update_by = #{updateBy.id},</if>
+				<if test="updateDate != null">update_date = #{updateDate},</if>
+				<if test="remarks != null">remarks = #{remarks}</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE erp_store_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getErpStoreInfo" resultMap="erpStoreInfoResultMap">
+		SELECT
+			esi.id AS "esi_id",
+			esi.is_main AS "esi_is_main",
+			esi.short_name AS "esi_short_name",
+			esi.province AS "esi_province",
+			esi.city AS "esi_city",
+			esi.area AS "esi_area",
+			esi.province_name AS "esi_province_name",
+			esi.city_name AS "esi_city_name",
+			esi.area_name AS "esi_area_name",
+			esi.address AS "esi_address",
+			esi.telephone AS "esi_telephone",
+			esi.company_url AS "esi_company_url",
+			esi.business_type AS "esi_business_type",
+			esi.audit_status AS "esi_audit_status",
+			esi.shop_info_id AS "esi_shop_info_id",
+			esl.id AS "esl_id",
+			esl.`name` AS "esl_name",
+			esl.phone AS "esl_phone",
+			esl.email AS "esl_email",
+			eslp.id AS "eslp_id",
+			eslp.id_card_front_photo AS "eslp_id_card_front_photo",
+			eslp.id_card_reverse_photo AS "eslp_id_card_reverse_photo",
+			eslp.id_card_in_hand_photo AS "eslp_id_card_in_hand_photo",
+			esc.id AS "esc_id",
+			esc.business_licence AS "esc_business_licence",
+			esc.organization_code_certificate AS "esc_organization_code_certificate",
+			esc.special_certificate AS "esc_special_certificate"
+		FROM
+			erp_store_info esi
+		LEFT JOIN
+			erp_store_linkman esl
+		ON
+			esi.id = esl.store_info_id AND esl.del_flag = 0
+		LEFT JOIN
+			erp_store_legal_person eslp
+		ON 
+			esi.legal_person_id = eslp.id AND eslp.del_flag = 0
+		LEFT JOIN
+			erp_store_credentials esc
+		ON
+			esi.credentials_id = esc.id AND esc.del_flag = 0
+		WHERE
+			esi.del_flag = 0
+			and esi.sync_oem = 'N'
+		<if test="erpStoreInfoId != null">AND esi.id = #{erpStoreInfoId}</if>
+		<if test="shopId != null">AND esi.shop_info_id = #{shopId}</if>
+		<if test="isMain != null">AND esi.is_main = #{isMain}</if>
+	</select>
+	
+	<resultMap type="com.yunnex.ops.erp.modules.store.basic.entity.ErpStoreInfoParam" id="erpStoreInfoResultMap">
+		<result column="esi_id" property="erpStoreInfo.id"/>
+		<result column="esi_is_main" property="erpStoreInfo.isMain"/>
+		<result column="esi_short_name" property="erpStoreInfo.shortName"/>
+		<result column="esi_province" property="erpStoreInfo.province"/>
+		<result column="esi_city" property="erpStoreInfo.city"/>
+		<result column="esi_area" property="erpStoreInfo.area"/>
+		<result column="esi_province_name" property="erpStoreInfo.provinceName"/>
+		<result column="esi_city_name" property="erpStoreInfo.cityName"/>
+		<result column="esi_area_name" property="erpStoreInfo.areaName"/>
+		<result column="esi_address" property="erpStoreInfo.address"/>
+		<result column="esi_telephone" property="erpStoreInfo.telephone"/>
+		<result column="esi_company_url" property="erpStoreInfo.companyUrl"/>
+		<result column="esi_business_type" property="erpStoreInfo.businessType"/>
+		<result column="esi_audit_status" property="erpStoreInfo.auditStatus"/>
+		<result column="esi_shop_info_id" property="erpStoreInfo.shopInfoId"/>
+		<result column="esl_id" property="erpStoreLinkman.id"/>
+		<result column="esl_name" property="erpStoreLinkman.name"/>
+		<result column="esl_phone" property="erpStoreLinkman.phone"/>
+		<result column="esl_email" property="erpStoreLinkman.email"/>
+		<result column="eslp_id" property="erpStoreLegalPerson.id"/>
+		<result column="eslp_id_card_front_photo" property="erpStoreLegalPerson.idCardFrontPhoto"/>
+		<result column="eslp_id_card_reverse_photo" property="erpStoreLegalPerson.idCardReversePhoto"/>
+		<result column="eslp_id_card_in_hand_photo" property="erpStoreLegalPerson.idCardInHandPhoto"/>
+		<result column="esc_id" property="erpStoreCredentials.id"/>
+		<result column="esc_business_licence" property="erpStoreCredentials.businessLicence"/>
+		<result column="esc_organization_code_certificate" property="erpStoreCredentials.organizationCodeCertificate"/>
+		<result column="esc_special_certificate" property="erpStoreCredentials.specialCertificate"/>
+	</resultMap>
+	
+	<!-- 修改外键值 -->
+	<update id="updateFK">
+		update erp_store_info set ${field} = #{value} where id = #{erpStoreInfoId}
+	</update>
+	
+	<select id="getStoreList" resultType="com.yunnex.ops.erp.modules.store.basic.entity.ErpStoreInfoList">
+		SELECT
+			esi.id AS "storeInfo.id",
+			esi.business_type AS "storeInfo.bussinessType",
+			weixin.id AS "weixin.id",
+			unionpay.id AS "unionpay.id",
+			unionpay.audit_status AS "unionpay.auditStatus",
+			weixin.credit_card_no AS "weiwin.bank.creditCardNo",
+			unionpay.credit_card_no AS "unionpay.bank.creditCardNo",
+			weixin.account_type AS "weixin.bank.accountType",
+			unionpay.account_type AS "unionpay.bank.ccountType"
+		FROM
+			erp_store_info esi
+		LEFT JOIN
+			(SELECT espw.id, esb.account_type, esb.credit_card_no FROM erp_store_pay_weixin espw LEFT JOIN erp_store_bank esb ON espw.bank_id = esb.id AND esb.del_flag = '0' WHERE espw.del_flag = '0') weixin
+		ON
+			esi.weixin_pay_id = weixin.id
+		LEFT JOIN
+			(SELECT espu.id, espu.audit_status, esb.account_type, esb.credit_card_no FROM erp_store_pay_unionpay espu LEFT JOIN erp_store_bank esb ON espu.bank_id = esb.id AND esb.del_flag = '0' WHERE espu.del_flag = '0') unionpay
+		ON
+			esi.unionpay_id = unionpay.id
+		WHERE
+			esi.del_flag = '0'
+		and 
+			esi.sync_oem = 'N'
+		<if test="businessType != null">AND esi.business_type = #{businessType}</if>
+		<if test="openUnionpay == true">AND unionpay.audit_status = 4</if>
+		<if test="different == true">AND IFNULL(weixin.credit_card_no, '') != IFNULL(unionpay.credit_card_no, '')</if>
+		<if test="unionpayAccountType != null">AND unionpay.account_type = #{unionpayAccountType}</if>
+		<if test="weixinAccountType != null">AND weixin.account_type = #{weixinAccountType}</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY esi.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getFinishStatus" resultType="map">
+		select
+			ifnull(esi.audit_status, 0) as "zhangbeiStatus",
+			ifnull(espw.audit_status, 0) as "weixinStatus",
+			ifnull(espu.audit_status, 0) as "ylStatus",
+			ifnull(espy.audit_status, 0) as "pyStatus",
+			ifnull(esaw.audit_status, 0) as "wbStatus",
+			esb.account_type as accountType,
+			esi.is_main as isMain,
+			ifnull(esi.finish_status, 1) as "storeInfoFinishStatus",
+			ifnull(esl.finish_status, 1) as "linkmanFinishStatus",
+			ifnull(slp.finish_status, 1) as "legalPersonFinishStatus",
+			ifnull(esc.finish_status, 1) as "credentialsFinishStatus",
+			ifnull(esb.finish_status, 1) as "bankFinishStatus",
+			ifnull(espw.finish_status, 1) as "weixinPayFinishStatus",
+			ifnull(espu.finish_status, 1) as "unionpayFinishStatus",
+			ifnull(esaw.finish_status, 1) as "weiboAdvFinishStatus",
+			ifnull(esppm.finish_status, 1) as "materialFinishStatus",
+			ifnull(esi.page_edit_tag, 1) as "storeEditTag"
+		from
+			erp_store_info esi
+		left join 
+			erp_store_linkman esl
+		on 
+			esi.id = esl.store_info_id and esl.del_flag = '0'
+		left join 
+			erp_store_legal_person slp
+		on
+			esi.legal_person_id = slp.id and slp.del_flag = '0'
+		left join 
+			erp_store_credentials esc
+		on
+			esi.credentials_id = esc.id and esc.del_flag = '0'
+		left join
+			erp_store_pay_weixin espw
+		on
+			esi.weixin_pay_id = espw.id and esi.del_flag = '0'
+		left join
+			erp_store_pay_unionpay espu
+		on
+			esi.unionpay_id = espu.id and espu.del_flag = '0'
+		left join 
+			erp_store_bank esb
+		on 
+			ifnull(espw.bank_id,espu.bank_id) = esb.id and esb.del_flag = '0'
+		left join
+			erp_store_advertiser_friends espy
+		on
+			esi.advertiser_friends_id = espy.id and espy.del_flag = '0'
+		left join
+			erp_store_advertiser_weibo esaw
+		on
+			esi.advertiser_weibo_id = esaw.id and esaw.del_flag = '0'
+		left join
+			erp_store_promote_photo_material esppm
+		on
+			esi.id = esppm.store_info_id and esppm.del_flag = '0'
+		where
+			esi.del_flag = '0'
+		and
+			esi.id = #{erpStoreInfoId}
+	</select>
+	
+	<update id="updatePageEditTag">
+		update erp_store_info set page_edit_tag = #{pageEditTag} where id = #{erpStoreInfoId}
+	</update>
+	
+	<select id="getBasic" resultMap="basicResultMap">
+		select
+			esi.id as "esi_id",
+			esi.is_main as "esi_is_main",
+			esi.short_name as "esi_short_name",
+			esi.province as "esi_province",
+			esi.city as "esi_city",
+			esi.area as "esi_area",
+			esi.province_name as "esi_province_name",
+			esi.city_name as "esi_city_name",
+			esi.area_name as "esi_area_name",
+			esi.address as "esi_address",
+			esi.telephone as "esi_telephone",
+			esi.company_url as "esi_company_url",
+			esi.business_type as "esi_business_type",
+			esi.audit_status as "esi_audit_status",
+			esi.shop_info_id as "esi_shop_info_id",
+			esl.id as "esl_id",
+			esl.`name` as "esl_name",
+			esl.phone as "esl_phone",
+			esl.email as "esl_email"
+		from
+			erp_store_info esi
+		left join
+			erp_store_linkman esl
+		on
+			esi.id = esl.store_info_id and esl.del_flag = 0
+		where
+			esi.del_flag = 0
+		and 
+			esi.sync_oem = 'N'
+		<if test="erpStoreInfoId != null and erpStoreInfoId != '' ">AND esi.id = #{erpStoreInfoId}</if>
+		<if test="shopId != null and shopId != '' ">AND esi.shop_info_id = #{shopId}</if>
+		<if test="isMain != null">AND esi.is_main = #{isMain}</if>
+	</select>
+	
+	<resultMap type="com.yunnex.ops.erp.modules.store.basic.entity.ErpStoreInfoParam" id="basicResultMap">
+		<result column="esi_id" property="erpStoreInfo.id"/>
+		<result column="esi_is_main" property="erpStoreInfo.isMain"/>
+		<result column="esi_short_name" property="erpStoreInfo.shortName"/>
+		<result column="esi_province" property="erpStoreInfo.province"/>
+		<result column="esi_city" property="erpStoreInfo.city"/>
+		<result column="esi_area" property="erpStoreInfo.area"/>
+		<result column="esi_province_name" property="erpStoreInfo.provinceName"/>
+		<result column="esi_city_name" property="erpStoreInfo.cityName"/>
+		<result column="esi_area_name" property="erpStoreInfo.areaName"/>
+		<result column="esi_address" property="erpStoreInfo.address"/>
+		<result column="esi_telephone" property="erpStoreInfo.telephone"/>
+		<result column="esi_company_url" property="erpStoreInfo.companyUrl"/>
+		<result column="esi_business_type" property="erpStoreInfo.businessType"/>
+		<result column="esi_audit_status" property="erpStoreInfo.auditStatus"/>
+		<result column="esi_shop_info_id" property="erpStoreInfo.shopInfoId"/>
+		<result column="esl_id" property="erpStoreLinkman.id"/>
+		<result column="esl_name" property="erpStoreLinkman.name"/>
+		<result column="esl_phone" property="erpStoreLinkman.phone"/>
+		<result column="esl_email" property="erpStoreLinkman.email"/>
+	</resultMap>
+	
+	<select id="getDocuments" resultMap="documentsResultMap">
+		select
+			eslp.id as "eslp_id",
+			eslp.id_card_front_photo as "eslp_id_card_front_photo",
+			eslp.id_card_reverse_photo as "eslp_id_card_reverse_photo",
+			eslp.id_card_in_hand_photo as "eslp_id_card_in_hand_photo",
+			esc.id as "esc_id",
+			esc.business_licence as "esc_business_licence",
+			esc.organization_code_certificate as "esc_organization_code_certificate",
+			esc.special_certificate as "esc_special_certificate",
+			IFNULL(weixin.bank_id,unionpay.bank_id) as "esc_bank_id",
+			IFNULL(weixin.branch_bank_name,unionpay.branch_bank_name) as "esc_bank_name",
+			IFNULL(unionpay.credit_card_front_photo,weixin.credit_card_front_photo) as "esc_credit_card_front_photo",
+			IFNULL(weixin.credit_card_reverse_photo,unionpay.credit_card_reverse_photo) as "esc_credit_card_reverse_photo",
+		IFNULL(weixin.open_account_licence,unionpay.open_account_licence) as "esc_open_account_licence"
+		from
+			erp_store_info esi
+		left join
+			erp_store_legal_person eslp
+		on 
+			esi.legal_person_id = eslp.id and eslp.del_flag = '0'
+		left join
+			erp_store_credentials esc
+		on
+			esi.credentials_id = esc.id and esc.del_flag = '0'
+		left join
+			(select espw.id, esb.id as bank_id, esb.branch_bank_name,esb.bank_name,esb.credit_card_front_photo,esb.credit_card_reverse_photo,esb.open_account_licence from erp_store_pay_weixin espw left join erp_store_bank esb on espw.bank_id = esb.id and esb.del_flag = '0' where espw.del_flag = '0') weixin
+		on
+			esi.weixin_pay_id = weixin.id
+		left join
+			(select espu.id, esb.id as bank_id, esb.branch_bank_name,esb.bank_name,esb.credit_card_front_photo,esb.credit_card_reverse_photo,esb.open_account_licence from erp_store_pay_unionpay espu left join erp_store_bank esb on espu.bank_id = esb.id and esb.del_flag = '0' where espu.del_flag = '0') unionpay
+		on
+			esi.unionpay_id = unionpay.id
+		where
+			esi.del_flag = 0
+		and 
+			esi.sync_oem = 'N'
+		<if test="erpStoreInfoId != null and erpStoreInfoId != '' ">AND esi.id = #{erpStoreInfoId}</if>
+		<if test="shopId != null and shopId != '' ">AND esi.shop_info_id = #{shopId}</if>
+		<if test="isMain != null">AND esi.is_main = #{isMain}</if>
+	</select>
+	
+	<resultMap type="com.yunnex.ops.erp.modules.store.basic.entity.ErpStoreInfoParam" id="documentsResultMap">
+		<result column="eslp_id" property="erpStoreLegalPerson.id"/>
+		<result column="eslp_id_card_front_photo" property="erpStoreLegalPerson.idCardFrontPhoto"/>
+		<result column="eslp_id_card_reverse_photo" property="erpStoreLegalPerson.idCardReversePhoto"/>
+		<result column="eslp_id_card_in_hand_photo" property="erpStoreLegalPerson.idCardInHandPhoto"/>
+		<result column="esc_id" property="erpStoreCredentials.id"/>
+		<result column="esc_business_licence" property="erpStoreCredentials.businessLicence"/>
+		<result column="esc_organization_code_certificate" property="erpStoreCredentials.organizationCodeCertificate"/>
+		<result column="esc_special_certificate" property="erpStoreCredentials.specialCertificate"/>
+		<result column="esc_bank_id" property="erpStoreBank.id"/>
+		<result column="esc_bank_name" property="erpStoreBank.bankName"/>
+		<result column="esc_credit_card_front_photo" property="erpStoreBank.creditCardFrontPhoto"/>
+		<result column="esc_credit_card_reverse_photo" property="erpStoreBank.creditCardReversePhoto"/>
+		<result column="esc_open_account_licence" property="erpStoreBank.openAccountLicence"/>
+	</resultMap>
+	
+	<select id="getAccounts" resultMap="accountsResultMap">
+		select
+			spw.id as spw_id,
+			IFNULL(spw.public_account_no,saf.account_no) as spw_account_no,
+			IFNULL(spw.public_account_password,saf.account_password) as spw_account_password,
+			spw.public_account_appid as spw_public_account_appid,
+			spw.audit_status as spw_audit_status,
+			spw.finish_status as spw_finish_status,
+			spw.email_no spw_email_no,
+			spw.email_password spw_email_password,
+			spw.operator_idcard spw_operator_idcard,
+			spw.operator_email spw_operator_email,
+			spw.operator_mobile spw_operator_mobile,
+			spw.operator_name spw_operator_name,
+			spw.weixin_no spw_weixin_no,
+			spw.public_account_name spw_public_account_name,
+			saw.id as saw_id,
+			saw.account_no as saw_account_no,
+			saw.account_password as saw_account_password,
+			saw.audit_status as saw_audit_status,
+			saw.finish_status as saw_finish_status
+		from
+			erp_store_info esi 
+		left join 
+			erp_store_pay_weixin spw 
+		on
+			esi.weixin_pay_id = spw.id and spw.del_flag = '0' 
+		left join 
+			erp_store_advertiser_weibo saw 
+		on
+			esi.advertiser_weibo_id = saw.id and saw.del_flag = '0'
+		left join 
+			erp_store_advertiser_friends saf 
+		on
+			esi.advertiser_friends_id = saf.id and saf.del_flag = '0'
+		where
+			esi.del_flag = '0'
+		and 
+			esi.sync_oem = 'N'
+			<if test="erpStoreInfoId != null and erpStoreInfoId != '' ">and esi.id = #{erpStoreInfoId}</if>
+			<if test="shopId != null and shopId != '' ">and esi.shop_info_id = #{shopId}</if>
+			<if test="isMain != null">and esi.is_main = #{isMain}</if>
+	</select>
+	
+	<resultMap type="com.yunnex.ops.erp.modules.store.basic.entity.ErpStoreInfoParam" id="accountsResultMap">
+		<result column="spw_id" property="erpStorePayWeixin.id"/>
+		<result column="spw_account_no" property="erpStorePayWeixin.publicAccountNo"/>
+		<result column="spw_account_password" property="erpStorePayWeixin.publicAccountPassword"/>
+		<result column="spw_audit_status" property="erpStorePayWeixin.auditStatus"/>
+		<result column="spw_finish_status" property="erpStorePayWeixin.finishStatus"/>
+		<result column="spw_email_no" property="erpStorePayWeixin.emailNo"/>
+		<result column="spw_email_password" property="erpStorePayWeixin.emailPassword"/>
+		<result column="spw_operator_idcard" property="erpStorePayWeixin.operatorIdcard"/>
+		<result column="spw_operator_email" property="erpStorePayWeixin.operatorEmail"/>
+		<result column="spw_operator_mobile" property="erpStorePayWeixin.operatorMobile"/>
+		<result column="spw_operator_name" property="erpStorePayWeixin.operatorName"/>
+		<result column="spw_weixin_no" property="erpStorePayWeixin.weixinNo"/>
+		<result column="spw_public_account_name" property="erpStorePayWeixin.publicAccountName"/>
+		<result column="spw_public_account_appid" property="erpStorePayWeixin.publicAccountAppid"/>
+		<result column="saw_id" property="erpStoreAdvertiserWeibo.id"/>
+		<result column="saw_account_no" property="erpStoreAdvertiserWeibo.accountNo"/>
+		<result column="saw_account_password" property="erpStoreAdvertiserWeibo.accountPassword"/>
+		<result column="saw_audit_status" property="erpStoreAdvertiserWeibo.auditStatus"/>
+		<result column="saw_finish_status" property="erpStoreAdvertiserWeibo.finishStatus"/>
+	</resultMap>
+	
+	<!-- 临时功能，初始化加密密码，使用后删除 -->
+	<select id="queryPassword" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		select ${id} as id ,${pwd} as pwd from ${tableName} d
+	</select>
+	<update id="updatePwd" parameterType="java.util.HashMap">
+		update
+			${tableName}
+		set
+			${pwd}  =(
+				case
+				<foreach collection="list" item="item" index="index">
+					when id = #{item.id} then #{item.pwd}
+				</foreach>
+				end
+			)
+		where
+			${id} in
+			<foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+				#{item.id}
+			</foreach>
+	</update>
+	
+	<!-- 根据掌贝id获取主门店信息 -->
+	<select id="getMainByZhangbeiId" resultType="ErpStoreInfo">
+		SELECT 
+			<include refid="erpStoreInfoColumns"/>
+		FROM erp_store_info a  
+			LEFT JOIN erp_shop_info shopInfo on a.shop_info_id = shopInfo.id AND shopInfo.del_flag ='0'
+		WHERE a.del_flag = '0' and a.is_main = '1' AND a.sync_oem = "N" and shopInfo.zhangbei_id = #{zhangbeiId} 
+	</select>
+	
+</mapper>

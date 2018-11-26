@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.order.dao.ErpOrderOriginalInfoDao">
+    
+	<sql id="erpOrderOriginalInfoColumns">
+		a.id AS "id",
+		a.order_number AS "orderNumber",
+		a.buy_date AS "buyDate",
+		a.pay_date AS "payDate",
+		a.create_at AS "createAt",
+		a.shop_id AS "shopId",
+		a.shop_name AS "shopName",
+		a.shop_abbreviation AS "shopAbbreviation",
+		a.shop_number AS "shopNumber",
+		a.shop_extension_id AS "shopExtensionId",
+		a.pre_price AS "prePrice",
+		a.real_price AS "realPrice",
+		a.contact_name AS "contactName",
+		a.source AS "source",
+		a.contact_number AS "contactNumber",
+		a.order_status AS "orderStatus",
+		<!-- a.pending_num AS "pendingNum",
+		a.process_num AS "processNum",
+		a.finish_num AS "finishNum", -->
+		a.order_type AS "orderType",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.remark AS "remark",
+		a.sort AS "sort",
+		a.del_flag AS "delFlag",
+		a.promote_phone AS "promotePhone",
+		a.promote_contact AS "promoteContact",
+		a.sale_person AS "salePerson",
+		a.cancel AS "cancel", 
+		a.industry_type AS "industryType", 
+		a.order_source AS "orderSource", 
+		(SELECT COUNT(c.id) FROM erp_order_split_info c WHERE a.id = c.order_id) as 'splitCount'
+	</sql>
+	
+	<sql id ="erpOrderOriginalInfoColumnsTwo">
+		a.id AS "id",
+		a.order_number AS "orderNumber",
+		a.buy_date AS "buyDate",
+		a.pay_date AS "payDate",
+		a.create_at AS "createAt",
+		a.shop_id AS "shopId",
+		a.shop_name AS "shopName",
+		a.shop_abbreviation AS "shopAbbreviation",
+		a.shop_number AS "shopNumber",
+		a.shop_extension_id AS "shopExtensionId",
+		a.pre_price AS "prePrice",
+		a.real_price AS "realPrice",
+		a.contact_name AS "contactName",
+		a.source AS "source",
+		a.contact_number AS "contactNumber",
+		a.order_status AS "orderStatus",
+		a.order_type AS "orderType",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.remark AS "remark",
+		a.sort AS "sort",
+		a.del_flag AS "delFlag",
+		a.promote_phone AS "promotePhone",
+		a.promote_contact AS "promoteContact",
+		a.sale_person AS "salePerson",
+		a.cancel AS "cancel", 
+		a.industry_type AS "industryType", 
+		a.order_source AS "orderSource"
+	</sql>
+	
+	<sql id="erpOrderOriginalInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="ErpOrderOriginalInfo">
+		SELECT 
+			<include refid="erpOrderOriginalInfoColumns"/>
+		FROM erp_order_original_info a
+		<include refid="erpOrderOriginalInfoJoins"/>
+		WHERE a.id = #{id} 
+	</select>
+	
+	<select id="getDetail" resultType="ErpOrderOriginalInfo">
+		SELECT 
+			<include refid="erpOrderOriginalInfoColumns"/>,
+			SUM(b.pending_num) AS "pendingNum",
+			SUM(b.process_num) AS "processNum",
+			SUM(b.finish_num) AS "finishNum" 
+		FROM erp_order_original_info a LEFT JOIN erp_order_original_good b ON a.id = b.order_id  
+		WHERE a.id = #{id} 
+		GROUP BY a.id
+	</select>
+	
+	<select id="getCalcInfo" resultType="ErpOrderOriginalInfo">
+		SELECT 
+			<include refid="erpOrderOriginalInfoColumns"/>,
+			SUM(b.real_price) AS "real_price",
+			SUM(b.pending_num) AS "pendingNum",
+			SUM(b.process_num) AS "processNum",
+			SUM(b.finish_num) AS "finishNum" 
+		FROM erp_order_original_info a LEFT JOIN erp_order_original_good b ON a.id = b.order_id  
+		<where>
+			a.id = #{id} 
+			<if test="goodType != null">
+				and good_type_id = #{goodType}
+			</if>
+		</where>
+		GROUP BY a.id
+	</select>
+	
+	
+	<select id="findList" resultType="ErpOrderOriginalInfo">
+		SELECT 
+			<include refid="erpOrderOriginalInfoColumns"/> ,
+			SUM(b.pending_num) AS "pendingNum",
+			SUM(b.process_num) AS "processNum",
+			SUM(b.finish_num) AS "finishNum"
+		FROM erp_order_original_info a LEFT JOIN erp_order_original_good b ON a.id = b.order_id
+		<include refid="erpOrderOriginalInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orderNumber != null and orderNumber != ''">
+				AND a.order_number LIKE 
+					<if test="dbName == 'oracle'">'%'||#{orderNumber}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{orderNumber}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{orderNumber},'%')</if>
+			</if>
+			<choose>
+				<when test="beginBuyDate != null and endBuyDate != null and beginBuyDate != '' and endBuyDate != ''">
+					AND a.buy_date BETWEEN #{beginBuyDate} AND DATE_ADD(#{endBuyDate}, INTERVAL 1 DAY)
+				</when>
+				<when test="beginBuyDate != null and beginBuyDate != ''">
+					AND a.buy_date &gt;= #{beginBuyDate}
+				</when>
+				<when test="endBuyDate != null and endBuyDate != ''">
+					AND a.buy_date &lt;= DATE_ADD(#{endBuyDate}, INTERVAL 1 DAY)
+				</when>
+			</choose>
+			<if test="shopName != null and shopName != ''">
+				AND a.shop_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{shopName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{shopName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{shopName},'%')</if>
+			</if>
+			<if test="contactName != null and contactName != ''">
+				AND a.contact_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{contactName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{contactName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{contactName},'%')</if>
+			</if>
+			<if test="contactNumber != null and contactNumber != ''">
+				AND a.contact_number LIKE 
+					<if test="dbName == 'oracle'">'%'||#{contactNumber}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{contactNumber}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{contactNumber},'%')</if>
+			</if>
+			<if test="orderType != null and orderType != ''">
+				AND a.order_type=#{orderType}
+			</if>
+			<if test="goodType != null and goodType != ''">
+				AND b.good_type_id=#{goodType}
+			</if>
+			<if test="null != orderStatusList and orderStatusList.size > 0">
+				AND a.order_status IN
+				<foreach collection="orderStatusList" index="index" item="item"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		GROUP BY a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.buy_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpOrderOriginalInfo">
+		SELECT 
+			<include refid="erpOrderOriginalInfoColumns"/>
+		FROM erp_order_original_info a
+		<include refid="erpOrderOriginalInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO erp_order_original_info(
+			id,
+			order_number,
+			buy_date,
+			pay_date,
+			create_at,
+			shop_id,
+			shop_name,
+			shop_abbreviation,
+			shop_number,
+			shop_extension_id,
+			pre_price,
+			real_price,
+			contact_name,
+			source,
+			contact_number,
+			pending_num,
+			process_num,
+			finish_num,
+			order_type,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			remark,
+			sort,
+			del_flag,
+			<if test="orderStatus != null">order_status,</if>
+			promote_phone,
+			promote_contact,
+			sale_person,
+			cancel, 
+			industry_type,
+			order_source
+		) VALUES (
+			#{id},
+			#{orderNumber},
+			#{buyDate},
+			#{payDate},
+			#{createAt},
+			#{shopId},
+			#{shopName},
+			#{shopAbbreviation},
+			#{shopNumber},
+			#{shopExtensionId},
+			#{prePrice},
+			#{realPrice},
+			#{contactName},
+			#{source},
+			#{contactNumber},
+			#{pendingNum},
+			#{processNum},
+			#{finishNum},
+			#{orderType},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{remark},
+			#{sort},
+			#{delFlag},
+			<if test="orderStatus != null">#{orderStatus},</if>
+			#{promotePhone},
+			#{promoteContact},
+			#{salePerson},
+			#{cancel}, 
+			#{industryType},
+			#{orderSource}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_order_original_info SET
+			order_number = #{orderNumber},
+			buy_date = #{buyDate},
+			pay_date = #{payDate},
+			create_at = #{createAt},
+			shop_id = #{shopId},
+			shop_name = #{shopName},
+			shop_abbreviation = #{shopAbbreviation},
+			shop_number = #{shopNumber},
+			shop_extension_id = #{shopExtensionId},
+			pre_price = #{prePrice},
+			real_price = #{realPrice},
+			contact_name = #{contactName},
+			source = #{source},
+			contact_number = #{contactNumber},
+			pending_num = #{pendingNum},
+			process_num = #{processNum},
+			finish_num = #{finishNum},
+			order_type = #{orderType},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			remark = #{remark},
+			sort = #{sort},
+			promote_phone=#{promotePhone},
+			promote_contact=#{promoteContact},
+			sale_person=#{salePerson},
+			cancel=#{cancel}, 
+			industry_type=#{industryType},
+			order_source=#{orderSource}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE erp_order_original_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateOrderStatus">
+		UPDATE erp_order_original_info SET 
+			order_status = #{orderStatus}
+		WHERE order_number = #{orderNumber} 
+	</update>
+	
+	<select id="countByOrderNumber" resultType="int">
+		SELECT COUNT(a.id)
+		FROM erp_order_original_info a
+		WHERE a.order_number = #{orderNumber}  
+	</select>
+	
+	<select id="countByCreateDate" resultType="int">
+		SELECT COUNT(a.id)
+		FROM erp_order_original_info a
+		WHERE a.create_at between #{startAt} AND #{endAt}
+	</select>
+	
+	<select id="getCancelOrderByOrderNo" resultType="ErpOrderOriginalInfo">
+		SELECT 
+			<include refid="erpOrderOriginalInfoColumns"/>
+		FROM erp_order_original_info a
+		WHERE a.order_number = #{orderNumber} and a.cancel = #{cancel}
+	</select>
+	
+	<update id="cancelOrder">
+		UPDATE erp_order_original_info SET 
+			cancel = #{cancel}
+		WHERE id = #{orderId} 
+	</update>
+	
+	<delete id="deleteById">
+		DELETE FROM erp_order_original_info 
+			WHERE id = #{id}
+	</delete>
+	
+	<!-- 根据掌贝id获取有商品待处理大于0的订单  -->
+	<select id="findNoBeginListByZhangbeiId" resultType="ErpOrderOriginalInfo">
+		SELECT
+			<include refid="erpOrderOriginalInfoColumnsTwo"/>
+		FROM erp_order_original_info a
+		LEFT JOIN erp_order_original_good eoog ON a.id = eoog.order_id
+		WHERE a.cancel = 0 AND a.del_flag = 0 AND eoog.del_flag = 0
+			AND eoog.pending_num &gt; 0 AND a.shop_id = #{zhangbeiId}
+			<if test="goodTypeId != null">
+			 AND eoog.good_type_id = #{goodTypeId}
+		</if>
+		GROUP BY a.id
+	</select>
+	
+	<!-- 根据掌贝id获取第一条订单信息  -->
+	<select id="getFirstByZhangbeiId" resultType="ErpOrderOriginalInfo">
+		SELECT
+			<include refid="erpOrderOriginalInfoColumnsTwo"/>
+		FROM erp_order_original_info a
+		WHERE  a.del_flag = 0 AND a.shop_id = #{zhangbeiId}
+			<if test="cancel != null">
+			 AND a.cancel = #{cancel}
+			</if>
+		order by a.buy_date limit 1
+	</select>
+</mapper>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.visit.dao.ErpVisitServiceItemDao">
+    
+    <sql id="erpVisitServiceItemColumns">
+        a.id AS "id",
+        a.service_type_code AS "serviceTypeCode",
+        a.service_type AS "serviceType",
+        a.service_goal_code AS "serviceGoalCode",
+        a.service_goal AS "serviceGoal",
+        a.service_item_code AS "serviceItemCode",
+        a.service_item AS "serviceItem",
+        a.service_time_length AS "serviceTimeLength",
+        a.service_time_length_txt AS "serviceTimeLengthTxt",
+        a.service_item_attendees AS "serviceItemAttendees",
+        a.service_flag AS "serviceFlag",
+        a.default_flag AS "defaultFlag",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.del_flag AS "delFlag",
+        a.remark AS "remark"
+    </sql>
+
+    <sql id="erpVisitServiceItemJoins">
+    </sql>
+    
+    <select id="get" resultType="ErpVisitServiceItem">
+        SELECT
+            <include refid="erpVisitServiceItemColumns"/>
+        FROM erp_visit_service_item a
+        <include refid="erpVisitServiceItemJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="ErpVisitServiceItem">
+        SELECT
+            <include refid="erpVisitServiceItemColumns"/>
+        FROM erp_visit_service_item a
+        <include refid="erpVisitServiceItemJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="serviceGoalCode != null">
+            	AND a.service_goal_code = #{serviceGoalCode}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="ErpVisitServiceItem">
+        SELECT
+            <include refid="erpVisitServiceItemColumns"/>
+        FROM erp_visit_service_item a
+        <include refid="erpVisitServiceItemJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO erp_visit_service_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">id,</if>
+			<if test="serviceTypeCode != null">service_type_code,</if>
+			<if test="serviceType != null">service_type,</if>
+			<if test="serviceGoalCode != null">service_goal_code,</if>
+			<if test="serviceGoal != null">service_goal,</if>
+			<if test="serviceItemCode != null">service_item_code,</if>
+			<if test="serviceItem != null">service_item,</if>
+			<if test="serviceTimeLength != null">service_time_length,</if>
+			<if test="serviceTimeLengthTxt != null">service_time_length_txt,</if>
+			<if test="serviceItemAttendees != null">service_item_attendees,</if>
+			<if test="serviceFlag != null">service_flag,</if>
+			<if test="defaultFlag != null">default_flag,</if>
+			<if test="createBy.id != null">create_by,</if>
+			<if test="createDate != null">create_date,</if>
+			<if test="updateBy.id != null">update_by,</if>
+			<if test="updateDate != null">update_date,</if>
+			<if test="delFlag != null">del_flag,</if>
+			<if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="serviceTypeCode != null">#{serviceTypeCode},</if>
+			<if test="serviceType != null">#{serviceType},</if>
+			<if test="serviceGoalCode != null">#{serviceGoalCode},</if>
+			<if test="serviceGoal != null">#{serviceGoal},</if>
+			<if test="serviceItemCode != null">#{serviceItemCode},</if>
+			<if test="serviceItem != null">#{serviceItem},</if>
+			<if test="serviceTimeLength != null">#{serviceTimeLength},</if>
+			<if test="serviceTimeLengthTxt != null">#{serviceTimeLengthTxt},</if>
+			<if test="serviceItemAttendees != null">#{serviceItemAttendees},</if>
+			<if test="serviceFlag != null">#{serviceFlag},</if>
+			<if test="defaultFlag != null">#{defaultFlag},</if>
+			<if test="createBy.id != null">#{createBy.id},</if>
+			<if test="createDate != null">#{createDate},</if>
+			<if test="updateBy.id != null">#{updateBy.id},</if>
+			<if test="updateDate != null">#{updateDate},</if>
+			<if test="delFlag != null">#{delFlag},</if>
+			<if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="update">
+        UPDATE erp_visit_service_item
+            <set>
+                <if test="serviceTypeCode != null">service_type_code = #{serviceTypeCode},</if>
+                <if test="serviceType != null">service_type = #{serviceType},</if>
+                <if test="serviceGoalCode != null">service_goal_code = #{serviceGoalCode},</if>
+                <if test="serviceGoal != null">service_goal = #{serviceGoal},</if>
+                <if test="serviceItemCode != null">service_item_code = #{serviceItemCode},</if>
+                <if test="serviceItem != null">service_item = #{serviceItem},</if>
+                <if test="serviceTimeLength != null">service_time_length = #{serviceTimeLength},</if>
+                <if test="serviceTimeLengthTxt != null">service_time_length_txt = #{serviceTimeLengthTxt},</if>
+                <if test="serviceItemAttendees != null">service_item_attendees = #{serviceItemAttendees},</if>
+                <if test="serviceFlag != null">service_flag = #{serviceFlag},</if>
+                <if test="defaultFlag != null">default_flag = #{defaultFlag},</if>
+                <if test="updateBy.id != null">update_by = #{updateBy.id},</if>
+                <if test="updateDate != null">update_date = #{updateDate},</if>
+                <if test="remark != null">remark = #{remark},</if>
+            </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE erp_visit_service_item SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+	<!-- 根据visitInfoId 获取勾选服务项目 -->
+	<select id="findByVisitInfoId" resultType="ErpVisitServiceItem">
+        SELECT
+            <include refid="erpVisitServiceItemColumns"/>
+        FROM erp_visit_service_item a 
+        LEFT JOIN erp_visit_service_item_record itemRecord ON a.service_item_code = itemRecord.service_item_code AND itemRecord.del_flag = '0'
+		WHERE a.del_flag = '0' AND itemRecord.service_info_id = #{visitInfoId} and itemRecord.service_start_time is not null
+    </select>
+    
+    <!-- 根据visitInfoId 获取上门目的名称 -->
+    <select id="getServiceGoalName" resultType="java.lang.String">
+    	SELECT a.service_goal
+    	FROM erp_visit_service_item a 
+		LEFT JOIN erp_visit_service_info visitInfo on a.service_goal_code = visitInfo.service_goal_code AND visitInfo.del_flag = '0'
+		WHERE a.del_flag = '0' AND visitInfo.id = #{visitInfoId} limit 1 
+    </select>
+</mapper>

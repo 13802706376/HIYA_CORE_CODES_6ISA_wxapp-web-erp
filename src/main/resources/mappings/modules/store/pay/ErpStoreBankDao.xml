@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.store.pay.dao.ErpStoreBankDao">
+    
+	<sql id="erpStoreBankColumns">
+		a.bank_name AS "bankName",
+		a.id AS "id",
+		a.account_type AS "accountType",
+		a.bank_id AS "bankId",
+		a.open_account_name AS "openAccountName",
+		a.branch_bank_name AS "branchBankName",
+		a.credit_card_no AS "creditCardNo",
+		a.bank_no AS "bankNo",
+		a.zhangbei_bind_count AS "zhangbeiBindCount",
+		a.pay_way AS "payWay",
+		a.province AS "province",
+		a.province_name AS "provinceName",
+		a.city AS "city",
+		a.city_name AS "cityName",
+		a.area AS "area",
+		a.area_name AS "areaName",
+		a.credit_card_front_photo AS "creditCardFrontPhoto",
+		a.credit_card_reverse_photo AS "creditCardReversePhoto",
+		a.open_account_licence AS "openAccountLicence",
+		a.authorize_proxy AS "authorizeProxy",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.finish_status AS "finishStatus",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="erpStoreBankJoins">
+	</sql>
+    
+	<select id="get" resultType="ErpStoreBank">
+		SELECT 
+			<include refid="erpStoreBankColumns"/>
+		FROM erp_store_bank a
+		<include refid="erpStoreBankJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErpStoreBank">
+		SELECT 
+			<include refid="erpStoreBankColumns"/>
+		FROM erp_store_bank a
+		<include refid="erpStoreBankJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="openAccountName != null and openAccountName != ''">
+				AND a.open_account_name = #{openAccountName}
+			</if>
+			<if test="creditCardNo != null and creditCardNo != ''">
+				AND a.credit_card_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{creditCardNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{creditCardNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{creditCardNo},'%')</if>
+			</if>
+			<if test="bankNo != null and bankNo != ''">
+				AND a.bank_no = #{bankNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findBankNames" resultType="ErpStoreBank">
+		SELECT 
+			DISTINCT(bank_name) AS "bankName"
+		FROM erp_store_bank a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpStoreBank">
+		SELECT 
+			<include refid="erpStoreBankColumns"/>
+		FROM erp_store_bank a
+		<include refid="erpStoreBankJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO erp_store_bank(
+			bank_name,
+			id,
+			account_type,
+			bank_id,
+			open_account_name,
+			branch_bank_name,
+			credit_card_no,
+			bank_no,
+			zhangbei_bind_count,
+			pay_way,
+			province,
+			province_name,
+			city,
+			city_name,
+			area,
+			area_name,
+			credit_card_front_photo,
+			credit_card_reverse_photo,
+			open_account_licence,
+			authorize_proxy,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			finish_status,
+			del_flag
+		) VALUES (
+			#{bankName},
+			#{id},
+			#{accountType},
+			#{bankId},
+			#{openAccountName},
+			#{branchBankName},
+			#{creditCardNo},
+			#{bankNo},
+			#{zhangbeiBindCount},
+			#{payWay},
+			#{province},
+			#{provinceName},
+			#{city},
+			#{cityName},
+			#{area},
+			#{areaName},
+			#{creditCardFrontPhoto},
+			#{creditCardReversePhoto},
+			#{openAccountLicence},
+			#{authorizeProxy},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{finishStatus},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_store_bank 
+		<set> 
+			<if test="accountType != null">account_type = #{accountType},</if>
+			<if test="bankId != null">bank_id = #{bankId},</if>
+			<if test="bankName != null">bank_name = #{bankName},</if>
+			<if test="openAccountName != null">open_account_name = #{openAccountName},</if>
+			<if test="branchBankName != null">branch_bank_name = #{branchBankName},</if>
+			<if test="creditCardNo != null">credit_card_no = #{creditCardNo},</if>
+			<if test="bankNo != null">bank_no = #{bankNo},</if>
+			<if test="zhangbeiBindCount != null">zhangbei_bind_count = #{zhangbeiBindCount},</if>
+			<if test="payWay != null">pay_way = #{payWay},</if>
+			<if test="province != null">province = #{province},</if>
+			<if test="provinceName != null">province_name = #{provinceName},</if>
+			<if test="city != null">city = #{city},</if>
+			<if test="cityName != null">city_name = #{cityName},</if>
+			<if test="area != null">area = #{area},</if>
+			<if test="areaName != null">area_name = #{areaName},</if>
+			<if test="creditCardFrontPhoto != null">credit_card_front_photo = #{creditCardFrontPhoto},</if>
+			<if test="creditCardReversePhoto != null">credit_card_reverse_photo = #{creditCardReversePhoto},</if>
+			<if test="openAccountLicence != null">open_account_licence = #{openAccountLicence},</if>
+			<if test="authorizeProxy != null">authorize_proxy = #{authorizeProxy},</if>
+			<if test="updateBy != null and updateBy.id != null">update_by = #{updateBy.id},</if>
+			<if test="updateDate != null">update_date = #{updateDate},</if>
+			<if test="remarks != null">remarks = #{remarks}</if>
+			<if test="finishStatus != null">finish_status = #{finishStatus}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE erp_store_bank SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findShopBanksByCreditCardNo" resultType="ErpStoreBank">
+		SELECT
+			<include refid="erpStoreBankColumns"/>
+		FROM
+			(SELECT 
+				esb.*
+			FROM
+				erp_store_info esi
+			INNER JOIN
+				erp_store_pay_weixin espw
+			ON
+				esi.weixin_pay_id = espw.id AND espw.del_flag = '0'
+			INNER JOIN
+				erp_store_bank esb
+			ON
+				espw.bank_id = esb.id AND esb.del_flag = '0'
+			WHERE
+				esi.del_flag = '0'
+			and 
+				esi.sync_oem = 'N'
+			AND
+				esi.shop_info_id = #{shopInfoId}
+			
+			UNION
+			
+			SELECT 
+				esb.*
+			FROM
+				erp_store_info esi
+			INNER JOIN
+				erp_store_pay_unionpay espu
+			ON
+				esi.unionpay_id = espu.id AND espu.del_flag = '0'
+			INNER JOIN
+				erp_store_bank esb
+			ON
+				espu.bank_id = esb.id AND esb.del_flag = '0'
+			WHERE
+				esi.del_flag = '0'
+			and 
+				esi.sync_oem = 'N'
+			AND
+				esi.shop_info_id = #{shopInfoId}) a
+		<where>
+			<if test="creditCardNo != null and creditCardNo != ''">
+				a.credit_card_no LIKE 
+				<if test="dbName == 'oracle'">'%'||#{creditCardNo}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{creditCardNo}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{creditCardNo},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

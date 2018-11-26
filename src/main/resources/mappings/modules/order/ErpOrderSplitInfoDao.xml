@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.order.dao.ErpOrderSplitInfoDao">
+
+	<sql id="erpOrderSplitInfoColumns">
+		a.id AS "id",
+		a.order_id AS "orderId",
+		a.shop_id AS "shopId",
+		a.order_number AS "orderNumber",
+		a.split_id AS "splitId",
+		a.original_good_id AS "originalGoodId",
+		a.good_name AS "goodName",
+		a.good_type_id AS "goodTypeId",
+		a.good_type_name AS "goodTypeName",
+		a.num AS "num",
+		a.price AS "price",
+		a.status AS "status",
+		a.create_date
+		AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS
+		"updateDate",
+		a.update_by AS "updateBy.id",
+		a.remark AS "remark",
+		a.sort
+		AS "sort",
+		a.del_flag AS "delFlag",
+		a.hurry_flag AS "hurryFlag",
+		a.planning_expert AS "planningExpert",
+		a.PROC_INS_ID AS "procInsId",
+		a.promotion_time AS "promotionTime",
+		a.next_contact_time AS "nextContactTime",
+		a.pending_prod_flag AS "pendingProdFlag",
+		a.next_license_time AS "nextLicenseTime",
+		a.next_qualification_time AS "nextQualificationTime",
+		a.publish_to_wxapp AS "publishToWxapp",
+		a.comment_count AS "commentCount",
+		a.end_time AS "endTime",
+		a.look_effect_flag AS "lookEffectFlag"
+	</sql>
+	
+	<sql id="erpOrderSplitInfoColumnsUser">
+		a.id AS "id",
+		a.order_id AS "orderId",
+		a.shop_id AS "shopId",
+		a.order_number AS "orderNumber",
+		a.split_id AS "splitId",
+		a.original_good_id AS "originalGoodId",
+		a.good_name AS "goodName",
+		a.good_type_id AS "goodTypeId",
+		a.good_type_name AS "goodTypeName",
+		a.num AS "num",
+		a.price AS "price",
+		a.status AS "status",
+		a.create_date
+		AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS
+		"updateDate",
+		a.update_by AS "updateBy.id",
+		a.remark AS "remark",
+		a.sort
+		AS "sort",
+		a.del_flag AS "delFlag",
+		a.hurry_flag AS "hurryFlag",
+		a.planning_expert AS "planningExpert",
+		a.PROC_INS_ID AS "procInsId",
+		a.promotion_time AS "promotionTime",
+		a.next_contact_time AS "nextContactTime",
+		b.name AS "planningName"
+	</sql>
+
+	<sql id="erpOrderSplitInfoJoins">
+	</sql>
+
+	<select id="get" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		<include refid="erpOrderSplitInfoJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getByProcInstId" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		<include refid="erpOrderSplitInfoJoins" />
+		WHERE a.PROC_INS_ID = #{act.procInsId}
+	</select>
+
+	<select id="findList" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		<include refid="erpOrderSplitInfoJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		<include refid="erpOrderSplitInfoJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO erp_order_split_info(
+		id,
+		order_id,
+		shop_id,
+		order_number,
+		split_id,
+		original_good_id,
+		good_name,
+		good_type_id,
+		good_type_name,
+		num,
+		price,
+		<if test="status != null">status,</if>
+		create_date,
+		create_by,
+		update_date,
+		update_by,
+		remark,
+		sort,
+		del_flag,
+		planning_expert,
+		promotion_time ,
+		next_contact_time 
+		) VALUES (
+		#{id},
+		#{orderId},
+		#{shopId},
+		#{orderNumber},
+		#{splitId},
+		#{originalGoodId},
+		#{goodName},
+		#{goodTypeId},
+		#{goodTypeName},
+		#{num},
+		#{price},
+		<if test="status != null">#{status},</if>
+		#{createDate},
+		#{createBy.id},
+		#{updateDate},
+		#{updateBy.id},
+		#{remark},
+		#{sort},
+		#{delFlag},
+		#{planningExpert},
+		#{promotionTime},
+		#{nextContactTime}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE erp_order_split_info SET
+		order_id = #{orderId},
+		shop_id = #{shopId},
+		order_number = #{orderNumber},
+		split_id = #{splitId},
+		original_good_id = #{originalGoodId},
+		good_name = #{goodName},
+		good_type_id = #{goodTypeId},
+		good_type_name = #{goodTypeName},
+		num = #{num},
+		price = #{price},
+		<if test="status != null">status = #{status},</if>
+		update_date = #{updateDate},
+		update_by = #{updateBy.id},
+		remark = #{remark},
+		sort = #{sort},
+		planning_expert=#{planningExpert},
+		promotion_time=#{promotionTime},
+		next_contact_time=#{nextContactTime},
+		pending_prod_flag=#{pendingProdFlag},
+		next_license_time=#{nextLicenseTime},
+		next_qualification_time=#{nextQualificationTime}
+		
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE erp_order_split_info SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="countByOrderId" resultType="int">
+		SELECT COUNT(a.id) FROM erp_order_split_info a
+		<where>
+			a.del_flag = 0 AND order_id = #{orderId}
+		</where>
+	</select>
+
+	<select id="findListByOrderId" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		<include refid="erpOrderSplitInfoJoins" />
+		<where>
+			a.order_id = #{orderId}
+		</where>
+	</select>
+
+	<select id="findListByOrderInfo" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		<include refid="erpOrderSplitInfoJoins" />
+		<where>
+			a.order_id = #{orderId}
+			<if test="goodType != null">
+				and good_type_id = #{goodType}
+			</if>
+		</where>
+	</select>
+
+	<update id="updateNum">
+		UPDATE erp_order_split_info SET
+		num = #{num}
+		WHERE id =
+		#{id}
+	</update>
+
+	<update id="updateHurryFlag">
+		UPDATE erp_order_split_info SET
+		hurry_flag =
+		#{hurryFlag}
+		where id = #{id}
+	</update>
+
+	<select id="findListByParams" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		LEFT JOIN erp_order_original_info i ON a.order_id=i.id
+		LEFT JOIN erp_shop_info s ON i.shop_extension_id=s.zhangbei_id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orderNumber != null and orderNumber != ''">
+				AND i.order_number LIKE CONCAT('%',#{orderNumber},'%')
+			</if>
+			<if test="hurryFlag != null and hurryFlag != ''">
+				AND a.hurry_flag=#{hurryFlag}
+			</if>
+			<if test="null != goodTypes and goodTypes.size > 0">
+				AND a.good_type_id IN
+				<foreach collection="goodTypes" index="index" item="item"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="shopName != null and shopName != ''">
+				AND i.shop_name=#{shopName}
+			</if>
+		</where>
+	</select>
+
+
+	<select id="findFollowOrderByParams" resultType="string">
+		SELECT DISTINCT a.`PROC_INS_ID` FROM erp_order_split_info a
+		LEFT JOIN erp_order_original_info i ON a.order_id=i.id
+		<where>
+			and a.del_flag = #{DEL_FLAG_NORMAL}
+			and EXISTS (SELECT   1 FROM erp_order_flow_user fu   WHERE a.`id` = fu.`split_id`  AND fu.`user_id`=#{userId} )
+			and a.status=0 and i.cancel=0
+			<if test="orderNumber != null and orderNumber != ''">
+				AND i.order_number LIKE CONCAT('%,', #{orderNumber},',%')
+			</if>
+			<if test="hurryFlag != null and hurryFlag != ''">
+				AND a.hurry_flag=#{hurryFlag}
+			</if>
+			<if test="null != goodTypes and goodTypes.size > 0">
+				AND a.good_type_id IN
+				<foreach collection="goodTypes" index="index" item="item"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY a.id DESC
+	</select>
+	
+	
+		<select id="getBystate" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		<include refid="erpOrderSplitInfoJoins" />
+		WHERE a.status = #{status}
+		and EXISTS (SELECT   1 FROM erp_order_flow_user fu   WHERE a.`id` = fu.`split_id`  AND fu.`user_id`=#{userId} )
+	</select>
+	
+	
+	<select id="findcomplete" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a
+		<where>
+			a.del_flag = #{del} AND a.status = #{status}
+			<if test="orderNumber != null and orderNumber != ''">
+				AND a.order_number=#{orderNumber} And a.split_id=#{splitId}
+			</if>
+			<if test="shopId != null and shopId != ''">
+				AND a.shop_id=#{shopId}
+			</if>
+			<if test="hurryFlag != null and hurryFlag != ''">
+				AND a.hurry_flag=#{hurryFlag}
+			</if>
+		</where>
+	</select>
+	
+	
+		<select id="findListByOrderInfoAndUser" resultType="ErpOrderSplitInfo">
+		SELECT
+		<include refid="erpOrderSplitInfoColumnsUser" />
+		FROM erp_order_split_info a
+		LEFT JOIN sys_user b ON b.id=a.planning_expert
+		<where>
+			a.order_id = #{orderId}
+			<if test="goodType != null">
+				and good_type_id = #{goodType}
+			</if>
+		</where>
+	</select>
+
+	<select id="getByOrderId" resultType="ErpOrderSplitInfo">
+		select
+			<include refid="erpOrderSplitInfoColumns" />
+		from
+			erp_order_split_info a
+		where
+			order_id = #{orderId}
+	</select>
+	
+	<update id="updateState">
+		UPDATE erp_order_split_info 
+			<set>
+				<if test="pendingProdFlag != null">pending_prod_flag = #{pendingProdFlag},</if>
+			</set>
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="findBeginOrder" resultType="ErpOrderSplitInfo">
+		SELECT 
+		s.id AS "id",a.id AS "erpStoreInfoId",s.good_name AS "goodName",s.good_type_name AS "goodTypeName",
+		shop.name AS "shopName",a.short_name AS "shortName",photo.environment_photo AS "environmentPhoto",
+		s.good_type_id AS "goodTypeId"
+		FROM `erp_order_split_info` s
+		LEFT JOIN (SELECT cs.split_id, cs.choice_store FROM `jyk_order_choice_store` cs WHERE cs.del_flag=0) mix ON s.id = mix.split_id 
+		LEFT JOIN `erp_store_info` a ON mix.`choice_store`=a.`id` 
+		LEFT JOIN `erp_shop_info` shop ON shop.`zhangbei_id`=s.`shop_id`
+		LEFT JOIN `erp_store_promote_photo_material` photo ON photo.`store_info_id`=a.`id` AND photo.del_flag = 0
+		LEFT JOIN  `erp_order_original_info` o ON s.order_id=o.id
+		WHERE s.shop_id=#{zhangbeiId} AND s.`status`=0 AND o.cancel=0
+	</select>
+
+	<select id="findOverOrder" resultType="ErpOrderSplitInfo">
+		SELECT 
+		s.`id` AS "id",a.id AS "erpStoreInfoId",s.`good_name` AS "goodName",s.`good_type_name` AS "goodTypeName",
+		shop.`name` AS "shopName",a.`short_name` AS "shortName",photo.`environment_photo` AS "environmentPhoto",
+		s.good_type_id AS "goodTypeId"
+		FROM `erp_order_split_info` s
+		LEFT JOIN (SELECT cs.split_id, cs.choice_store FROM `jyk_order_choice_store` cs WHERE cs.del_flag=0) mix ON s.id = mix.split_id 
+		LEFT JOIN `erp_store_info` a ON mix.`choice_store`=a.`id`  
+		LEFT JOIN `erp_shop_info` shop ON shop.`zhangbei_id`=s.`shop_id`
+		LEFT JOIN `erp_store_promote_photo_material` photo ON photo.`store_info_id`=a.`id` AND photo.del_flag = 0
+		LEFT JOIN  `erp_order_original_info` o ON s.order_id=o.id
+		WHERE s.shop_id=#{zhangbeiId} AND s.`status`=1 AND o.cancel=0
+	</select>
+	
+	<select id="findNoBeginOrder" resultType="ErpOrderSplitInfo">
+		SELECT 
+		g.`good_name` AS "goodName",g.`good_type_name` AS "goodTypeName",
+		a.`shop_name` AS "shopName",a.`id` AS "shopInfoId",g.good_type_id AS "goodTypeId"
+		FROM `erp_order_original_info` a
+		LEFT JOIN `erp_order_split_info` s ON a.id=s.`order_id`
+		LEFT JOIN `erp_order_original_good` g ON a.`id`=g.`order_id`
+		LEFT JOIN `erp_order_original_info` o ON s.order_id=o.id
+		WHERE a.shop_id=#{zhangbeiId} AND s.id IS NULL AND o.cancel=0
+	</select>
+	
+	<select id="getDiagnosisTaskInfo" resultType="map">
+		SELECT
+			aht.ID_ AS "taskId",
+			aht.ASSIGNEE_ AS "assignee"
+		FROM
+			erp_order_split_info eosi
+		LEFT JOIN
+			ACT_HI_TASKINST aht
+		ON
+			eosi.PROC_INS_ID = aht.PROC_INST_ID_
+		WHERE
+			eosi.id = #{splitId}
+		AND
+			aht.TASK_DEF_KEY_ = 'management_diagnosis_marketing_planning'
+		ORDER BY
+			aht.START_TIME_ DESC
+		LIMIT 1
+	</select>
+	
+	<update id="updateCommentCount">
+		update erp_order_split_info set comment_count = #{commentCount} where id = #{id}
+	</update>
+    
+    <update id="updatePendingStatus">
+        update erp_order_split_info set activation_time = #{activationTime}, pending_prod_flag = #{pendingProdFlag} where id = #{id}
+    </update>
+    
+    <update id="updateRiskStatus">
+	    <if test="null != jykOrderIds and jykOrderIds.size > 0">
+	        update erp_order_split_info set
+	            timeout_flag = #{timeoutFlag}
+	        where id in     
+	        <foreach collection="jykOrderIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+	    </if>
+    </update>
+
+	<!-- 根据掌贝id和分单状态获 分单列表 -->
+    <select id="findListByZhangbeiIdStatus" resultType="com.yunnex.ops.erp.modules.order.entity.ErpOrderSplitInfo">
+    	SELECT
+			<include refid="erpOrderSplitInfoColumns" />
+		FROM erp_order_split_info a 
+		LEFT JOIN erp_order_original_info eooi on a.order_id = eooi.id 
+		WHERE  
+		<if test="null != zhangbeiId">a.shop_id = #{zhangbeiId} and </if>
+		<if test="null != status">a.`status` = #{status}  and </if>
+		eooi.cancel = 0  and a.del_flag = 0 and eooi.del_flag = 0
+    </select>
+    
+    <!-- 计算所有订单中包含客常来类型，其他类型的 其他类型服务数量总数 -->
+    <select id="countKeBeginByZhangbeiId" resultType="java.lang.Integer">
+    	select  if(count(*)>0,sum(orderNum),0)
+    	from (
+	    	SELECT
+				case when sum(if(eood.good_type_id 
+											in  <foreach item="goodTypeId" index="index" collection="goodTypeIds" open="(" separator="," close=")">  
+           											#{goodTypeId}
+           										</foreach>   
+         						,1,0)) > 0 then sum(if(eood.good_id 
+         												in 	<foreach item="goodId" index="index" collection="goodIds" open="(" separator="," close=")">  
+           														#{goodId}
+           													</foreach>
+           											,eood.num,0)) else 0 end as orderNum
+			FROM
+			erp_order_original_info eooi
+			LEFT JOIN erp_order_original_good eood ON eooi.id = eood.order_id
+			WHERE eooi.cancel = 0 AND eooi.del_flag = 0 AND eood.del_flag = 0
+				AND eooi.shop_id = #{zhangbeiId}
+			GROUP BY eooi.id
+    	) t
+    </select>
+    
+    <!-- 正在跑的流程，根据zhangbeiid、流程角色类型 获取用户id -->
+    <select id="findBeginByRole" resultType="java.lang.String">
+	    SELECT
+			flowUser.user_id
+		FROM
+			erp_order_split_info split
+		LEFT JOIN erp_order_original_info orderInfo ON split.order_id = orderInfo.id AND orderInfo.cancel = 0 and orderInfo.del_flag = 0
+		LEFT JOIN erp_order_flow_user flowUser on split.id = flowUser.split_id 
+		where orderInfo.id is not null and split.del_flag = 0 and split.`status` = 0 and flowUser.id is not null
+				<if test="zhangbeiId != null">	
+					AND split.shop_id = #{zhangbeiId}
+				</if>
+				<if test="roleTypeList != null and roleTypeList.size > 0">
+					AND flowUser.flow_user_id in 
+					<foreach item="roleTypeItem" collection="roleTypeList" open="(" separator="," close=")">
+						#{roleTypeItem}
+					</foreach>
+				</if>
+		GROUP BY flowUser.user_id
+    </select>
+    
+    <!-- 修改分单信息 -->
+    <update id="updateInfo">
+    	UPDATE erp_order_split_info 
+			<set>
+                <if test="lookEffectFlag != null">look_effect_flag = #{lookEffectFlag},</if>
+                <if test="remarks != null">remarks = #{remarks},</if>
+                <if test="updateDate != null">update_date = #{updateDate},</if>
+            </set>
+        WHERE id = #{id}
+    </update>
+    
+</mapper>

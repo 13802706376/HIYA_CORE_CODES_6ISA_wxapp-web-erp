@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.act.dao.ActDao">
+    
+	<update id="updateProcInsIdByBusinessId">
+		UPDATE ${businessTable} SET 
+			proc_ins_id = #{procInsId}
+		WHERE id = #{businessId}
+		
+	</update>
+	
+	
+	<sql id="jykFlowColumns">
+		art.ID_ AS "act.taskId",
+		art.TASK_DEF_KEY_ AS "act.taskDefKey",
+		art.PROC_DEF_ID_ AS "act.procDefId",
+		art.ASSIGNEE_ AS "act.assignee",
+		art.NAME_ AS "act.taskName",
+		art.PROC_INST_ID_ AS "act.businessId",
+		art.PROC_INST_ID_ AS "act.procInsId",
+		art.EXECUTION_ID_ AS "act.executionId",
+		arp.KEY_ AS "act.procDefKey",
+		aht.START_TIME_ AS "act.taskStarterDate",
+		arte.`status` AS "taskExt.status",
+		arte.`pending_prod_flag` AS "taskExt.pendingProdFlag",
+		jf.split_id AS "jykFlow.splitId",
+		jf.promotion_time AS "jykFlow.promotionTime",
+		eosi.create_date AS "orderDate",
+		eosi.id AS "orderSplitInfo.id",
+		eosi.promotion_time  AS "orderSplitInfo.promotionTime",
+		eosi.next_contact_time  AS "orderSplitInfo.nextContactTime",
+		eosi.next_license_time  AS "orderSplitInfo.nextLicenseTime",
+		eosi.next_qualification_time  AS "orderSplitInfo.nextQualificationTime",
+		eosi.hurry_flag  AS "orderSplitInfo.hurryFlag",
+		eosi.suspend_flag  AS "orderSplitInfo.suspendFlag",
+		eosi.order_id  AS "orderSplitInfo.orderId",
+		eosi.split_id  AS "orderSplitInfo.splitId",
+		eosi.good_name  AS "orderSplitInfo.goodName",
+		eosi.num  AS "orderSplitInfo.num",
+		eosi.good_type_name  AS "orderSplitInfo.goodTypeName",	
+        eosi.pending_produced AS "orderSplitInfo.pendingProduced",
+        eosi.timeout_flag AS "orderSplitInfo.timeoutFlag",
+        eosi.activation_time AS "orderSplitInfo.activationTime",
+		eooi.order_number  AS "orderOriginalInfo.orderNumber",
+		eooi.buy_date  AS "orderOriginalInfo.buyDate",
+		eooi.shop_id  AS "orderOriginalInfo.shopId",
+		eooi.shop_name  AS "orderOriginalInfo.shopName",
+		eooi.agent_name  AS "orderOriginalInfo.agentName",
+		eooi.order_type  AS "orderOriginalInfo.orderType",
+		eooi.contact_name  AS "orderOriginalInfo.contactName",
+		eooi.contact_number  AS "orderOriginalInfo.contactNumber",
+		eooi.promote_contact  AS "orderOriginalInfo.promoteContact",
+		eooi.promote_phone  AS "orderOriginalInfo.promotePhone",
+		esi.id AS "shop.id",
+		esi.zhangbei_id AS "shop.zhangbeiId",
+		esi.zhangbei_state AS "shop.zhangbeiState",
+		esi.zhangbei_remark AS "shop.zhangbeiRemark",
+		esi.wechatpay_state AS "shop.wechatpayState",
+		esi.wechatpay_remark AS "shop.wechatpayRemark",
+		esi.unionpay_state AS "shop.unionpayState",
+		esi.unionpay_remark AS "shop.unionpayRemark",
+		esi.`name` AS "shop.name",
+		esi.service_provider AS "shop.serviceProvider",
+		NULL AS "sdiFlow.sdiId",
+		NULL AS "payInto.id",
+		NULL AS "payInto.shopId",
+		NULL AS "payInto.storeId",
+		NULL AS "payInto.intopiecesName",
+		NULL AS "payInto.createDate",
+		IFNULL(arae.task_date_hours, 0) AS "act.taskDateHours",
+		IFNULL(arae.urgent_task_date_hours, 0) AS "act.urgentTaskDateHours",
+		arae.task_user_role AS "act.taskUserRole",
+		arae.task_user_role2 AS "act.taskUserRole2",
+		arae.is_key_point AS "act.isKeyPoint",
+		arae.normal_task_hours AS "act.normalTaskHours",
+		arae.urgent_task_hours AS "act.urgentTaskHours",
+		arae.activation_normal_task_hours AS "act.activationNormalTaskHours",
+		arae.activation_urgent_task_hours AS "act.activationUrgentTaskHours"
+	</sql>
+	
+	<sql id="jykFlowJoins">
+		INNER JOIN 
+			ACT_RE_PROCDEF arp
+		ON
+			art.proc_def_id_ = arp.id_ AND (arp.key_ = 'jyk_flow' OR arp.key_ = 'jyk_flow_new')
+		LEFT JOIN
+			ACT_HI_TASKINST aht
+		ON 
+			art.ID_ = aht.ID_
+		LEFT JOIN
+			ACT_RU_TASK_EXT arte
+		ON
+			art.ID_ = arte.task_id
+		LEFT JOIN 
+			ACT_RE_ACTDEF_EXT arae
+		ON 
+			arp.KEY_ = arae.process_define_key AND art.TASK_DEF_KEY_ = arae.act_id
+		LEFT JOIN
+			jyk_flow jf
+		ON
+			art.PROC_INST_ID_ = jf.PROC_INS_ID AND jf.del_flag = 0
+		LEFT JOIN
+			erp_order_split_info eosi
+		ON
+			jf.split_id = eosi.id AND eosi.del_flag = 0
+		LEFT JOIN 
+			erp_order_original_info eooi 
+		ON 
+			eosi.order_id = eooi.id AND eooi.cancel = 0 AND eooi.del_flag = 0
+		LEFT JOIN 
+			erp_shop_info esi 
+		ON 
+			eooi.shop_id = esi.zhangbei_id AND esi.del_flag = 0
+	</sql>
+	
+	<sql id="sdiFlowColumns">
+		art.ID_ AS "act.taskId",
+		art.TASK_DEF_KEY_ AS "act.taskDefKey",
+		art.PROC_DEF_ID_ AS "act.procDefId",
+		art.ASSIGNEE_ AS "act.assignee",
+		art.NAME_ AS "act.taskName",
+		art.PROC_INST_ID_ AS "act.businessId",
+		art.PROC_INST_ID_ AS "act.procInsId",
+		art.EXECUTION_ID_ AS "act.executionId",
+		arp.KEY_ AS "act.procDefKey",
+		aht.START_TIME_ AS "act.taskStarterDate",
+		arte.`status` AS "taskExt.status",
+		arte.`pending_prod_flag` AS "taskExt.pendingProdFlag",
+		NULL  AS "jykFlow.splitId",
+		NULL  AS "jykFlow.promotionTime",
+		esdi.create_date AS "orderDate",
+		NULL  AS "orderSplitInfo.id",
+		NULL  AS "orderSplitInfo.promotionTime",
+		NULL  AS "orderSplitInfo.nextContactTime",
+		NULL  AS "orderSplitInfo.nextLicenseTime",
+		NULL  AS "orderSplitInfo.nextQualificationTime",
+		NULL  AS "orderSplitInfo.hurryFlag",
+		NULL  AS "orderSplitInfo.suspendFlag",
+		NULL  AS "orderSplitInfo.orderId",
+		NULL  AS "orderSplitInfo.splitId",
+		NULL  AS "orderSplitInfo.goodName",
+		NULL  AS "orderSplitInfo.num",
+		NULL  AS "orderSplitInfo.goodTypeName",	
+        NULL AS "orderSplitInfo.pendingProduced",
+        NULL AS "orderSplitInfo.timeoutFlag",
+        NULL AS "orderSplitInfo.activationTime",
+		eooi.order_number  AS "orderOriginalInfo.orderNumber",
+		eooi.buy_date  AS "orderOriginalInfo.buyDate",
+		eooi.shop_id  AS "orderOriginalInfo.shopId",
+		eooi.shop_name  AS "orderOriginalInfo.shopName",
+		eooi.agent_name  AS "orderOriginalInfo.agentName",
+		eooi.order_type  AS "orderOriginalInfo.orderType",
+		eooi.contact_name  AS "orderOriginalInfo.contactName",
+		eooi.contact_number  AS "orderOriginalInfo.contactNumber",
+		eooi.promote_contact  AS "orderOriginalInfo.promoteContact",
+		eooi.promote_phone  AS "orderOriginalInfo.promotePhone",
+		esi.id AS "shop.id",
+		esi.zhangbei_id AS "shop.zhangbeiId",
+		esi.zhangbei_state AS "shop.zhangbeiState",
+		esi.zhangbei_remark AS "shop.zhangbeiRemark",
+		esi.wechatpay_state AS "shop.wechatpayState",
+		esi.wechatpay_remark AS "shop.wechatpayRemark",
+		esi.unionpay_state AS "shop.unionpayState",
+		esi.unionpay_remark AS "shop.unionpayRemark",
+		esi.`name` AS "shop.name",
+		esi.service_provider AS "shop.serviceProvider",
+		sf.sdi_id AS "sdiFlow.sdiId",
+		NULL AS "payInto.id",
+		NULL AS "payInto.shopId",
+		NULL AS "payInto.storeId",
+		NULL AS "payInto.intopiecesName",
+		NULL AS "payInto.createDate",
+		IFNULL(arae.task_date_hours,0) AS "act.taskDateHours",
+		IFNULL(arae.urgent_task_date_hours,0) AS "act.urgentTaskDateHours",
+		arae.task_user_role AS "act.taskUserRole",
+		arae.task_user_role2 AS "act.taskUserRole2",
+        NULL AS "act.isKeyPoint",
+        NULL AS "act.normalTaskHours",
+        NULL AS "act.urgentTaskHours",
+        NULL AS "act.activationNormalTaskHours",
+        NULL AS "act.activationUrgentTaskHours"
+	</sql>
+	
+	<sql id="sdiFlowJoins">
+		INNER JOIN 
+			ACT_RE_PROCDEF arp
+		ON
+			art.proc_def_id_ = arp.id_ AND arp.key_ = 'shop_data_input_flow'
+		LEFT JOIN
+			ACT_HI_TASKINST aht
+		ON 
+			art.ID_ = aht.ID_
+		LEFT JOIN
+			ACT_RU_TASK_EXT arte
+		ON
+			art.ID_ = arte.task_id
+		LEFT JOIN 
+			ACT_RE_ACTDEF_EXT arae
+		ON 
+			arp.KEY_ = arae.process_define_key AND art.TASK_DEF_KEY_ = arae.act_id
+		LEFT JOIN
+			erp_shop_data_input esdi
+		ON
+			art.proc_inst_id_ = esdi.proc_ins_id
+		LEFT JOIN 
+			erp_order_original_info eooi
+		ON
+			esdi.order_id = eooi.id AND eooi.cancel=0 AND eooi.del_flag = 0
+		LEFT JOIN 
+			sdi_flow sf
+		ON 
+			esdi.order_id = sf.order_id AND sf.del_flag = 0
+		LEFT JOIN 
+			erp_shop_info esi
+		ON
+			esdi.shop_id = esi.zhangbei_id AND esi.del_flag = 0
+	</sql>
+	
+	
+	<sql id="tasks">
+		SELECT
+			<include refid="jykFlowColumns"/>
+		FROM ACT_RU_TASK art
+			<include refid="jykFlowJoins"/>
+		
+		UNION
+		
+		SELECT
+			<include refid="sdiFlowColumns"/>
+		FROM ACT_RU_TASK art
+			<include refid="sdiFlowJoins"/>
+	</sql>
+	
+	<select id="findTasks" resultType="com.yunnex.ops.erp.modules.workflow.flow.from.FlowForm">
+		SELECT * FROM (
+			<include refid="tasks"/>
+		) flow 
+		ORDER BY orderDate DESC
+	</select>
+	
+	 
+	 <!-- 流程id中任务节点是否已完成 -->
+	<select id="getFinishTaskCount" resultType="int">
+		select count(*) from ACT_HI_TASKINST 
+		where 	PROC_INST_ID_ = #{procInsId} 
+				AND TASK_DEF_KEY_ = #{taskDefKey} 
+				AND DELETE_REASON_ = 'completed'
+	</select>
+	
+</mapper>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.store.advertiser.dao.ErpStoreAdvertiserWeiboDao">
+    
+	<sql id="erpStoreAdvertiserWeiboColumns">
+		a.id AS "id",
+		a.account_type AS "accountType",
+		a.account_no AS "accountNo",
+		a.account_password AS "accountPassword",
+		a.uid AS "uid",
+		a.nick_name AS "nickName",
+		a.relation_prove_letter AS "relationProveLetter",
+		a.adv_auth_letter AS "advAuthLetter",
+		a.promote_promise_letter AS "promotePromiseLetter",
+		a.audit_status AS "auditStatus",
+		a.finish_status AS "finishStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="erpStoreAdvertiserWeiboJoins">
+	</sql>
+    
+	<select id="get" resultType="ErpStoreAdvertiserWeibo">
+		SELECT 
+			<include refid="erpStoreAdvertiserWeiboColumns"/>
+		FROM erp_store_advertiser_weibo a
+		<include refid="erpStoreAdvertiserWeiboJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErpStoreAdvertiserWeibo">
+		SELECT 
+			<include refid="erpStoreAdvertiserWeiboColumns"/>
+		FROM erp_store_advertiser_weibo a
+		<include refid="erpStoreAdvertiserWeiboJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="accountType != null and accountType != ''">
+				AND a.account_type = #{accountType}
+			</if>
+			<if test="accountNo != null and accountNo != ''">
+				AND a.account_no = #{accountNo}
+			</if>
+			<if test="uid != null and uid != ''">
+				AND a.uid = #{uid}
+			</if>
+			<if test="nickName != null and nickName != ''">
+				AND a.nick_name = #{nickName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErpStoreAdvertiserWeibo">
+		SELECT 
+			<include refid="erpStoreAdvertiserWeiboColumns"/>
+		FROM erp_store_advertiser_weibo a
+		<include refid="erpStoreAdvertiserWeiboJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO erp_store_advertiser_weibo(
+			id,
+			<if test="accountType != null">account_type,</if>
+			account_no,
+			account_password,
+			uid,
+			nick_name,
+			relation_prove_letter,
+			adv_auth_letter,
+			promote_promise_letter,
+			<if test="auditStatus != null">audit_status,</if>
+			finish_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			<if test="accountType != null">#{accountType},</if>
+			#{accountNo},
+			#{accountPassword},
+			#{uid},
+			#{nickName},
+			#{relationProveLetter},
+			#{advAuthLetter},
+			#{promotePromiseLetter},
+			<if test="auditStatus != null">#{auditStatus},</if>
+			#{finishStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE erp_store_advertiser_weibo  	
+		<set>
+			<if test="accountType != null">account_type = #{accountType},</if>
+			<if test="accountNo != null">account_no = #{accountNo},</if>
+			<if test="accountPassword != null">account_password = #{accountPassword},</if>
+			<if test="uid != null">uid = #{uid},</if>
+			<if test="nickName != null">nick_name = #{nickName},</if>
+			<if test="relationProveLetter != null">relation_prove_letter = #{relationProveLetter},</if>
+			<if test="advAuthLetter != null">adv_auth_letter = #{advAuthLetter},</if>
+			<if test="promotePromiseLetter != null">promote_promise_letter = #{promotePromiseLetter},</if>
+			<if test="auditStatus != null">audit_status = #{auditStatus},</if>
+			<if test="finishStatus != null">finish_status = #{finishStatus},</if>
+			<if test="updateBy != null and updateBy.id != null">update_by = #{updateBy.id},</if>
+			<if test="updateDate != null">update_date = #{updateDate},</if>
+			<if test="remarks != null">remarks = #{remarks}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE erp_store_advertiser_weibo SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getAdvInfo" resultType="ErpStoreAdvertiserWeibo">
+		SELECT
+			<include refid="erpStoreAdvertiserWeiboColumns"/>
+		FROM
+			erp_store_info esi
+		LEFT JOIN
+			erp_store_advertiser_weibo a
+		ON
+			esi.advertiser_weibo_id = a.id AND a.del_flag = 0
+		WHERE
+			esi.del_flag = 0
+		<if test="erpStoreInfoId != null">AND esi.id = #{erpStoreInfoId}</if>
+		<if test="shopId != null">AND esi.shop_info_id = #{shopId}</if>
+		<if test="isMain != null">AND esi.is_main = #{isMain}</if>
+			and esi.sync_oem = 'N'
+	</select>
+	
+</mapper>

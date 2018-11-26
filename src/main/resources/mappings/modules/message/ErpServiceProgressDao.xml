@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.message.dao.ErpServiceProgressDao">
+    
+    <sql id="erpServiceProgressColumns">
+        a.id AS "id",
+        a.template_id AS "templateId",
+        a.proc_ins_id AS "procInsId",
+        a.start_time AS "startTime",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate"
+    </sql>
+
+    <sql id="erpServiceProgressJoins">
+    </sql>
+    
+    <select id="get" resultType="ErpServiceProgress">
+        SELECT
+            <include refid="erpServiceProgressColumns"/>
+        FROM erp_service_progress a
+        <include refid="erpServiceProgressJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="ErpServiceProgress">
+        SELECT
+            <include refid="erpServiceProgressColumns"/>
+        FROM erp_service_progress a
+        <include refid="erpServiceProgressJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="ErpServiceProgress">
+        SELECT
+            <include refid="erpServiceProgressColumns"/>
+        FROM erp_service_progress a
+        <include refid="erpServiceProgressJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO erp_service_progress
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">id,</if>
+			<if test="templateId != null">template_id,</if>
+			<if test="procInsId != null">proc_ins_id,</if>
+			<if test="startTime != null">start_time,</if>
+			<if test="remarks != null">remarks,</if>
+			<if test="delFlag != null">del_flag,</if>
+			<if test="createBy.id != null">create_by,</if>
+			<if test="createDate != null">create_date,</if>
+			<if test="updateBy.id != null">update_by,</if>
+			<if test="updateDate != null">update_date,</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="templateId != null">#{templateId},</if>
+			<if test="procInsId != null">#{procInsId},</if>
+			<if test="startTime != null">#{startTime},</if>
+			<if test="remarks != null">#{remarks},</if>
+			<if test="delFlag != null">#{delFlag},</if>
+			<if test="createBy.id != null">#{createBy.id},</if>
+			<if test="createDate != null">#{createDate},</if>
+			<if test="updateBy.id != null">#{updateBy.id},</if>
+			<if test="updateDate != null">#{updateDate},</if>
+        </trim>
+    </insert>
+
+    <update id="update">
+        UPDATE erp_service_progress
+            <set>
+                <if test="templateId != null">template_id = #{templateId},</if>
+                <if test="procInsId != null">proc_ins_id = #{procInsId},</if>
+                <if test="startTime != null">start_time = #{startTime},</if>
+                <if test="remarks != null">remarks = #{remarks},</if>
+                <if test="updateBy.id != null">update_by = #{updateBy.id},</if>
+                <if test="updateDate != null">update_date = #{updateDate},</if>
+            </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE erp_service_progress SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 进行中的服务进度，根据条件获取最大启动时间的服务进度 -->
+    <select id="getBeginMaxStartTime" resultType="com.yunnex.ops.erp.modules.message.extraModel.ServiceProgressExtra">
+    	SELECT 
+    		serviceProgress.proc_ins_id procInsId,serviceProgress.start_time startTime
+    		,scheduleTemplate.type,scheduleTemplate.`name`,scheduleTemplate.service_type serviceType
+    	FROM erp_service_progress serviceProgress 
+		LEFT JOIN erp_service_progress_template scheduleTemplate on serviceProgress.template_id =  scheduleTemplate.id
+		LEFT JOIN  erp_order_flow_user flowUser on serviceProgress.proc_ins_id = flowUser.flow_id
+		WHERE serviceProgress.del_flag = 0  AND scheduleTemplate.`status` = 'Begin'
+			AND serviceProgress.zhangbei_id = #{zhangbeiId}
+		  	AND flowUser.user_id = #{userId}
+			AND FIND_IN_SET(#{roleType},scheduleTemplate.service_roles) 
+		 ORDER BY serviceProgress.start_time desc limit 1
+    </select>
+    
+    <!-- 根据服务类型获取最大启动时间的服务进度 -->
+    <select id="getBeginMaxStartTimeByServiceType" resultType="com.yunnex.ops.erp.modules.message.extraModel.ServiceProgressExtra">
+   		SELECT 
+    		serviceProgress.proc_ins_id procInsId,serviceProgress.start_time startTime
+    		,scheduleTemplate.type,scheduleTemplate.`name`,scheduleTemplate.service_type serviceType
+    	FROM erp_service_progress serviceProgress 
+		LEFT JOIN erp_service_progress_template scheduleTemplate on serviceProgress.template_id =  scheduleTemplate.id
+		WHERE serviceProgress.del_flag = 0  AND scheduleTemplate.`status` = 'Begin'
+			AND serviceProgress.proc_ins_id = #{procInsId}
+			AND scheduleTemplate.service_type = #{serviceType}
+		ORDER BY serviceProgress.start_time desc limit 1
+    </select>
+    
+    <!-- 根据服务类型获取服务进度总数 -->
+    <select id="countByServiceType" resultType="int">
+    	SELECT count(*) FROM erp_service_progress serviceProgress 
+    	LEFT JOIN erp_service_progress_template scheduleTemplate on serviceProgress.template_id =  scheduleTemplate.id
+    		where serviceProgress.del_flag = 0  and serviceProgress.proc_ins_id = #{procInsId} AND scheduleTemplate.service_type=#{serviceType}
+    </select>
+    
+    <!-- 根据流程id 获取服务进度列表 -->
+    <select id="findExtra" resultType="com.yunnex.ops.erp.modules.message.extraModel.ServiceProgressExtra">
+    	SELECT 
+    		serviceProgress.proc_ins_id "procInsId",serviceProgress.start_time "startTime"
+    		,serviceProgress.zhangbei_id "zhangbeiId"
+			,scheduleTemplate.type,scheduleTemplate.`name`,scheduleTemplate.`status`,scheduleTemplate.content
+			,scheduleTemplate.service_type "serviceType",scheduleTemplate.sort
+			,link.type "linkType",link.param "linkParam"
+    	FROM erp_service_progress serviceProgress 
+		LEFT JOIN erp_service_progress_template scheduleTemplate on serviceProgress.template_id =  scheduleTemplate.id
+		LEFT JOIN erp_service_link link on scheduleTemplate.link_id = link.id
+		WHERE serviceProgress.del_flag = 0 
+			<if test="procInsId != null">
+				AND serviceProgress.proc_ins_id = #{procInsId}
+			</if>
+			<if test="serviceType != null">
+				AND scheduleTemplate.service_type = #{serviceType}
+			</if>
+		ORDER BY scheduleTemplate.sort
+    </select>
+
+</mapper>

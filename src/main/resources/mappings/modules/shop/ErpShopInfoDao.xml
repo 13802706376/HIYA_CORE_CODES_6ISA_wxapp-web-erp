@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunnex.ops.erp.modules.shop.dao.ErpShopInfoDao">
+
+	<sql id="erpShopInfoColumns">
+		a.id AS "id",
+		a.number AS "number",
+		a.name AS "name",
+		a.abbreviation AS "abbreviation",
+		a.industry_type AS "industryType",
+		a.address AS "address",
+		a.contact_email AS "contactEmail",
+		a.contact_name AS "contactName",
+		a.contact_phone AS "contactPhone",
+		a.service_provider AS "serviceProvider",
+		a.service_provider_phone AS
+		"serviceProviderPhone",
+		a.zhangbei_id AS "zhangbeiId",
+		a.zhangbei_password AS "zhangbeiPassword",
+		a.zhangbei_state AS "zhangbeiState",
+		a.store_count AS "storeCount",
+		a.create_date AS
+		"createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS
+		"updateDate",
+		a.update_by AS "updateBy.id",
+		a.remark AS "remark",
+		a.sort
+		AS "sort",
+		a.del_flag AS "delFlag",
+		a.into_pieces AS "intoPieces",
+		a.login_name AS "loginName",
+		a.alipa_state AS "alipaState",
+		a.operation_adviser_id AS "operationAdviserId"
+	</sql>
+
+	<sql id="erpShopInfoJoins">
+	</sql>
+
+	<select id="get" resultType="ErpShopInfo">
+		SELECT
+		<include refid="erpShopInfoColumns" />
+		FROM erp_shop_info a
+		<include refid="erpShopInfoJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="ErpShopInfo">
+		SELECT
+		<include refid="erpShopInfoColumns" />
+		FROM erp_shop_info a
+		<include refid="erpShopInfoJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="number != null and number != ''">
+				AND a.number LIKE
+				<if test="dbName == 'oracle'">'%'||#{number}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{number}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{number},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="industryType != null and industryType != ''">
+				AND a.industry_type = #{industryType}
+			</if>
+			<if test="contactName != null and contactName != ''">
+				AND a.contact_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{contactName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{contactName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{contactName},'%')</if>
+			</if>
+			<if test="contactPhone != null and contactPhone != ''">
+				AND a.contact_phone LIKE
+				<if test="dbName == 'oracle'">'%'||#{contactPhone}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{contactPhone}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{contactPhone},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="ErpShopInfo">
+		SELECT
+		<include refid="erpShopInfoColumns" />
+		FROM erp_shop_info a
+		<include refid="erpShopInfoJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="(number != null and number != '')
+						or (name != null and name != '')
+						or (industryType != null and industryType != '')
+						or (contactName != null and contactName != '')
+						or (contactPhone != null and contactPhone != '')">
+				AND(
+					1=2 
+				<if test="number != null and number != ''">
+					OR a.number LIKE
+					<if test="dbName == 'oracle'">'%'||#{number}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{number}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{number},'%')</if>
+				</if>
+				<if test="name != null and name != ''">
+					OR a.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+				</if>
+				<if test="industryType != null and industryType != ''">
+					OR a.industry_type = #{industryType}
+				</if>
+				<if test="contactName != null and contactName != ''">
+					OR a.contact_name LIKE
+					<if test="dbName == 'oracle'">'%'||#{contactName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{contactName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{contactName},'%')</if>
+				</if>
+				<if test="contactPhone != null and contactPhone != ''">
+					OR a.contact_phone LIKE
+					<if test="dbName == 'oracle'">'%'||#{contactPhone}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{contactPhone}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{contactPhone},'%')</if>
+				</if>
+				)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO erp_shop_info(
+		id,
+		number,
+		name,
+		abbreviation,
+		industry_type,
+		address,
+		contact_email,
+		contact_name,
+		contact_phone,
+		service_provider,
+		service_provider_phone,
+		zhangbei_id,
+		zhangbei_password,
+		store_count,
+		create_date
+		) VALUES (
+		#{id},
+		#{number},
+		#{name},
+		#{abbreviation},
+		#{industryType},
+		#{address},
+		#{contactEmail},
+		#{contactName},
+		#{contactPhone},
+		#{serviceProvider},
+		#{serviceProviderPhone},
+		#{zhangbeiId},
+		#{zhangbeiPassword},
+		#{storeCount},
+		#{createDate}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE erp_shop_info 
+		<set>
+			<if test="number != null">number = #{number},</if>
+			<if test="name != null">name = #{name},</if>
+			<if test="abbreviation != null">abbreviation = #{abbreviation},</if>
+			<if test="industryType != null">industry_type = #{industryType},</if>
+			<if test="address != null">address = #{address},</if>
+			<if test="contactEmail != null">contact_email = #{contactEmail},</if>
+			<if test="contactName != null">contact_name = #{contactName},</if>
+			<if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+			<if test="serviceProvider != null">service_provider = #{serviceProvider},</if>
+			<if test="serviceProviderPhone != null">service_provider_phone = #{serviceProviderPhone},</if>
+			<if test="zhangbeiId != null">zhangbei_id = #{zhangbeiId},</if>
+			<if test="zhangbeiPassword != null">zhangbei_password = #{zhangbeiPassword},</if>
+			<if test="storeCount != null">store_count = #{storeCount},</if>
+			<if test="sort != null">sort = #{sort},</if>
+			<if test="updateBy != null and updateBy.id != null">update_by = #{updateBy.id},</if>
+			<if test="updateDate != null">update_date = #{updateDate},</if>
+			<if test="remarks != null">remarks = #{remarks}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE erp_shop_info SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="getDistinctdustry" resultType="String">
+		SELECT
+		DISTINCT(industry_type) FROM erp_shop_info a
+	</select>
+
+	<select id="countShopByZhangbeiId" resultType="Integer">
+		SELECT COUNT(a.id)
+		FROM erp_shop_info a WHERE zhangbei_id = #{zhangbeiId}
+	</select>
+	
+	<!-- 根据掌贝id 获取商户信息 -->
+	<select id="getByZhangbeiId" resultType="ErpShopInfo">
+		SELECT <include refid="erpShopInfoColumns" /> FROM erp_shop_info a WHERE zhangbei_id = #{zhangbeiId} AND del_flag = 0
+	</select>
+
+	<!-- 根据登录名获取商户信息 -->
+	<select id="getByLoginName" resultType="ErpShopInfo">
+		SELECT <include refid="erpShopInfoColumns" /> FROM erp_shop_info a WHERE login_name = #{loginName} AND del_flag = 0
+	</select>
+
+	<update id="updateByZhangbeiId">
+		UPDATE erp_shop_info SET
+		number = #{erpShopInfo.number},
+		name = #{erpShopInfo.name},
+		abbreviation = #{erpShopInfo.abbreviation},
+		industry_type = #{erpShopInfo.industryType},
+		address = #{erpShopInfo.address},
+		contact_email = #{erpShopInfo.contactEmail},
+		contact_name = #{erpShopInfo.contactName},
+		contact_phone = #{erpShopInfo.contactPhone},
+		service_provider = #{erpShopInfo.serviceProvider},
+		service_provider_phone = #{erpShopInfo.serviceProviderPhone},
+		update_date = #{erpShopInfo.updateDate}
+		WHERE zhangbei_id = #{erpShopInfo.zhangbeiId}
+	</update>
+	
+	<update id="updateIntoPiecesById">
+		UPDATE erp_shop_info SET
+		into_pieces = 1
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findshopwaiter" resultType="ErpShopInfo">
+	SELECT a.flow_user_id AS "fwrole", GROUP_CONCAT(DISTINCT  c.name) AS "fwname",GROUP_CONCAT(DISTINCT  b.good_name) AS "fwtype"   FROM `erp_order_split_info` b LEFT JOIN `erp_order_flow_user` a ON a.split_id=b.id   LEFT JOIN `sys_user` c ON a.user_id=c.id
+ 	 WHERE b.shop_id=#{shopid}  AND a.flow_user_id IS NOT NULL  GROUP BY a.flow_user_id  
+	</select>
+	
+	
+</mapper>

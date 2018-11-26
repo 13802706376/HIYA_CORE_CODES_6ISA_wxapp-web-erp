@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yunnex.ops.erp.modules.workflow.user.dao.ErpOrderFlowUserDao">
+
+	<sql id="erpOrderFlowUserColumns">
+		a.id AS "id",
+		a.order_id AS "orderId",
+		a.split_id AS
+		"splitId",
+		a.flow_id AS "flowId",
+		a.user_id AS "user.id",
+		a.create_date
+		AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS
+		"updateDate",
+		a.update_by AS "updateBy.id",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag",
+		u5.name AS "user.name",
+		a.flow_user_id AS "flowUserId"
+	</sql>
+
+	<sql id="erpOrderFlowUserJoins">
+		LEFT JOIN sys_user u5 ON u5.id = a.user_id
+	</sql>
+
+	<select id="get" resultType="ErpOrderFlowUser">
+		SELECT
+		<include refid="erpOrderFlowUserColumns" />
+		FROM erp_order_flow_user a
+		<include refid="erpOrderFlowUserJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findListByFlowId" resultType="ErpOrderFlowUser">
+		SELECT
+		<include refid="erpOrderFlowUserColumns" />
+		FROM erp_order_flow_user a
+		<include refid="erpOrderFlowUserJoins" />
+		WHERE a.flow_id=#{procInsId}
+		and a.flow_user_id =#{flowUserId}
+	</select>
+
+	<select id="findListByFlowIdAndUserId" resultType="ErpOrderFlowUser">
+		SELECT
+		<include refid="erpOrderFlowUserColumns" />
+		FROM erp_order_flow_user a
+		<include refid="erpOrderFlowUserJoins" />
+		WHERE a.flow_id=#{procInsId}
+		  and a.user_id =#{userId}
+	</select>
+
+
+	<select id="findByProcInsIdAndRoleName" resultType="ErpOrderFlowUser">
+		SELECT
+			id AS id,
+			user_id AS "user.id"
+		FROM
+			`erp_order_flow_user`
+		WHERE
+			flow_id = #{procInsId}
+		AND 
+			flow_user_id = #{roleName};
+	</select>
+
+
+
+	<select id="findList" resultType="ErpOrderFlowUser">
+		SELECT
+		<include refid="erpOrderFlowUserColumns" />
+		FROM erp_order_flow_user a
+		<include refid="erpOrderFlowUserJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="ErpOrderFlowUser">
+		SELECT
+		<include refid="erpOrderFlowUserColumns" />
+		FROM erp_order_flow_user a
+		<include refid="erpOrderFlowUserJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO erp_order_flow_user(
+		id,
+		order_id,
+		split_id,
+		flow_id,
+		user_id,
+		flow_user_id,
+		create_date,
+		create_by,
+		update_date,
+		update_by,
+		remark,
+		del_flag
+		) VALUES (
+		#{id},
+		#{orderId},
+		#{splitId},
+		#{flowId},
+		#{user.id},
+		#{flowUserId},
+		#{createDate},
+		#{createBy.id},
+		#{updateDate},
+		#{updateBy.id},
+		#{remark},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE erp_order_flow_user SET
+		order_id = #{orderId},
+		split_id = #{splitId},
+		flow_id = #{flowId},
+		user_id = #{user.id},
+		update_date = #{updateDate},
+		update_by = #{updateBy.id},
+		remark =
+		#{remark}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE erp_order_flow_user SET
+		del_flag =
+		#{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>
